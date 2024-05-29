@@ -4,7 +4,7 @@ import { action } from "@/lib/safe-actions";
 import { uploadFileSchema } from "@/src/defintion";
 export const uploadFile = action(uploadFileSchema, async ({ email, file }) => {
     console.log("Email:", email, "Password:");
-    console.log("File:", file.size)
+    console.log("File:", file)
 
     // Do something useful here.
 });
