@@ -90,17 +90,30 @@ model User_Project {
 }
 
 model Project {
-    id            String         @id @default(cuid())
-    label         String
-    description   String?
-    slug          String         @unique
-    createdAt     DateTime       @default(now())
-    updatedAt     DateTime       @updatedAt
-    createdBy     String
-    isArchived    Boolean        @default(false)
-    softwareLabel String
-    Software      Software       @relation(fields: [softwareLabel], references: [label])
-    User_Project  User_Project[]
+    id                    String                  @id @default(cuid())
+    label                 String
+    description           String?
+    slug                  String                  @unique
+    createdAt             DateTime                @default(now())
+    updatedAt             DateTime                @updatedAt
+    createdBy             String
+    isArchived            Boolean                 @default(false)
+    softwareLabel         String
+    Software              Software                @relation(fields: [softwareLabel], references: [label])
+    User_Project          User_Project[]
+    Dsn                   Dsn[]
+    Society               Society[]
+    Establishement        Establishment[]
+    Job                   Job[]
+    Idcc                  Idcc[]
+    Person                Person[]
+    WorkContract          WorkContract[]
+    Transco_Society       Transco_Society[]
+    Transco_Establishment Transco_Establishment[]
+    Transco_Person        Transco_Person[]
+    Transco_WorkContract  Transco_WorkContract[]
+    Transco_Job           Transco_Job[]
+    Logger                Logger[]
 }
 
 model Software {
@@ -130,6 +143,299 @@ model Logger {
     id        String   @id @default(cuid())
     level     String
     message   String
+    projectId String?
+    Project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    createdBy String
+}
+
+model Dsn {
+    id              String          @id @default(cuid())
+    month           String
+    dsnVersion      String
+    provider        String
+    softwareName    String
+    softwareVersion String
+    totalRows       String
+    type            String
+    createdAt       DateTime        @default(now())
+    updatedAt       DateTime        @updatedAt
+    createdBy       String
+    projectId       String
+    Project         Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    Society         Society[]
+    Job             Job[]
+    Idcc            Idcc[]
+    Person          Person[]
+    WorkContract    WorkContract[]
+    Establishment   Establishment[]
+}
+
+model Society {
+    dsnId          String
+    Dsn            Dsn             @relation(fields: [dsnId], references: [id], onDelete: Cascade)
+    siren          String
+    apen           String
+    zipCode        String
+    city           String
+    projectId      String
+    Project        Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    Establishement Establishment[]
+    createdAt      DateTime        @default(now())
+    updatedAt      DateTime        @updatedAt
+    createdBy      String
+
+    @@id([dsnId, siren])
+}
+
+model Transco_Society {
+    projectId String
+    Project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    siren     String
+    newId     String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    createdBy String
+    slug      String   @unique @default(cuid())
+
+    @@id([projectId, siren])
+}
+
+model Establishment {
+    siren        String
+    nic          String
+    ape          String
+    postalCode   String
+    city         String
+    legalStatus  String
+    projectId    String
+    createdAt    DateTime       @default(now())
+    updatedAt    DateTime       @updatedAt
+    createdBy    String
+    dsnId        String
+    DSN          Dsn            @relation(fields: [dsnId], references: [id], onDelete: Cascade)
+    Project      Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    Society      Society        @relation(fields: [dsnId, siren], references: [dsnId, siren], onDelete: Cascade)
+    Person       Person[]
+    WorkContract WorkContract[]
+
+    @@id([dsnId, siren, nic])
+}
+
+model Transco_Establishment {
+    projectId String
+    Project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    siren     String
+    nic       String
+    newId     String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    createdBy String
+    slug      String   @unique @default(cuid())
+
+    @@id([projectId, siren, nic])
+}
+
+model Person {
+    projectId     String
+    dsnId         String
+    siren         String
+    nic           String
+    DSN           Dsn            @relation(fields: [dsnId], references: [id], onDelete: Cascade)
+    Project       Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    Establishment Establishment  @relation(fields: [dsnId, siren, nic], references: [dsnId, siren, nic], onDelete: Cascade)
+    numSS         String
+    lastname      String
+    surname       String
+    firstname     String
+    sex           String
+    birthday      DateTime
+    placeOfBith   String
+    address1      String
+    codeZip       String
+    city          String
+    country       String         @default("FR")
+    codeZipBith   String
+    countryBirth  String
+    address2      String?
+    address3      String?
+    email         String?
+    employeeId    String         @default("Pas de matricule")
+    graduate      String?
+    studies       String?
+    date          String?
+    ntt           String?
+    updatedAt     DateTime       @updatedAt
+    createdAt     DateTime       @default(now())
+    createdBy     String
+    WorkContract  WorkContract[]
+
+    @@id([dsnId, numSS])
+}
+
+model Transco_Person {
+    projectId String
+    Project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    siret     String
+    numSS     String
+    lastname  String
+    firstname String
+    oldId     String
+    newId     String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    createdBy String
+    slug      String   @unique @default(cuid())
+
+    @@id([projectId, numSS])
+}
+
+model WorkContract {
+    numSS                       String
+    dsnId                       String
+    contractId                  String
+    projectId                   String
+    siren                       String
+    nic                         String
+    Establishment               Establishment @relation(fields: [dsnId, siren, nic], references: [dsnId, siren, nic], onDelete: Cascade)
+    startDate                   DateTime
+    status                      String
+    retirement                  String
+    pcs                         String
+    pcsBis                      String?
+    mal                         String
+    employmentLabel             String
+    contract                    String
+    publicDispPolitic           String
+    contractEndDate             DateTime
+    DNACodeUnitTime             String
+    DSNWorkQuotaEstablishment   String
+    DSNWorkQuotaWorkContract    String
+    workTime                    String
+    ss                          String
+    idcc                        String
+    estabWorkPlace              String
+    vieillesse                  String
+    pattern                     String?
+    vacation                    String?
+    rateProfessionalFess        String?
+    foreigner                   String
+    exclusionDsn                String?
+    statusEmployment            String?
+    unemployment                String?
+    idPublicEmployer            String?
+    methodUnemployment          String?
+    joiningDate                 DateTime?
+    denunciationDate            DateTime?
+    dateManagementAgreement     DateTime?
+    idAgreement                 String?
+    healthRiskDelegate          String?
+    multipleJobCode             String
+    multipleEmployerCode        String
+    workAccidentRisk            String
+    idWorkAccidentRisk          String
+    positionCollectiveAgreement String?
+    apecita                     String?
+    rateAt                      String
+    contributingFullTime        String?
+    tip                         String?
+    useEstablishmentId          String?
+    livePerfomances             String?
+    licences                    String?
+    showId                      String?
+    showrunner                  String?
+    fpPcsfpPcs                  String?
+    typePosition                String?
+    fpQuotite                   String?
+    partTimeWork                String?
+    serviceCode                 String?
+    fpIndice                    String?
+    fpIndiceMaj                 String?
+    NBI                         String?
+    indiceOriginal              String?
+    article15                   String?
+    oldEstablishmentId          String?
+    oldIndice                   String?
+    SPP                         String?
+    contractualHours            String?
+    secondment                  String?
+    browsing                    String?
+    activityDutyRate            String?
+    payLevel                    String?
+    echelon                     String?
+    coefficient                 String?
+    boeth                       String?
+    addPublicPolicy             String?
+    arrangement                 String?
+    finaly                      String?
+    navy                        String?
+    navyCode                    String?
+    activityRate                String?
+    grade                       String?
+    cti                         String?
+    finess                      String?
+    dateStart                   DateTime?
+    Project                     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    Dsn                         Dsn           @relation(fields: [dsnId], references: [id], onDelete: Cascade)
+    Person                      Person        @relation(fields: [dsnId, numSS], references: [dsnId, numSS], onDelete: Cascade)
+    updatedAt                   DateTime      @updatedAt
+    createdAt                   DateTime      @default(now())
+    createdBy                   String
+
+    @@id([dsnId, numSS, contractId])
+}
+
+model Transco_WorkContract {
+    projectId  String
+    Project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    siret      String
+    numSS      String
+    firstname  String
+    lastname   String
+    contractId String
+    newId      String?
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    createdBy  String
+    slug       String   @unique @default(cuid())
+
+    @@id([projectId, numSS, contractId])
+}
+
+model Job {
+    id               String   @id @default(cuid())
+    dsnId            String
+    projectId        String
+    Project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    Dsn              Dsn      @relation(fields: [dsnId], references: [id], onDelete: Cascade)
+    employementLabel String
+    createdAt        DateTime @default(now())
+    updatedAt        DateTime @updatedAt
+    createdBy        String
+}
+
+model Transco_Job {
+    projectId        String
+    Project          Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    employementLabel String
+    newId            String?
+    newLabel         String?
+    createdAt        DateTime @default(now())
+    updatedAt        DateTime @updatedAt
+    createdBy        String
+    slug             String   @unique @default(cuid())
+
+    @@id([projectId, employementLabel])
+}
+
+model Idcc {
+    id        String   @id @default(cuid())
+    idcc      String
+    dsnId     String
+    projectId String
+    Project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    Dsn       Dsn      @relation(fields: [dsnId], references: [id], onDelete: Cascade)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     createdBy String

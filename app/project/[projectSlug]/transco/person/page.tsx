@@ -1,4 +1,6 @@
-import { Container, ContainerBreadCrumb } from "@/components/container/Container";
+import { columns } from "@/app/project/[projectSlug]/transco/person/dataTablecolumns"
+import { DataTable } from "@/components/ui/dataTable";
+import { Container, ContainerBreadCrumb, ContainerDataTable } from "@/components/container/Container";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -7,11 +9,11 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { Dashboard } from "@/components/Dashboard";
 import { auth } from "@/lib/auth";
 import { Project } from "@/src/class/project";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import CreateTransco from "@/components/button/CreateTransco";
 export default async function Page({ params }: { params: { projectSlug: string } }) {
     const session = await auth()
     if (!session?.user?.id) {
@@ -27,7 +29,19 @@ export default async function Page({ params }: { params: { projectSlug: string }
     if (!authorization) {
         throw new Error('Vous n\'avez pas accès à ce projet')
     }
-    const { countDsn, countNumSS, countEstablishment, countSociety, countTranscoJob, countTranscoPerson, countTranscoWorkContract } = await project.count()
+    const transcoPersonList = await project.getTranscoPerson()
+    const transcoPerson = transcoPersonList.map((transco) => {
+        return {
+            projectSlug: params.projectSlug,
+            slug: transco.slug,
+            firstname: transco.firstname,
+            lastname: transco.lastname,
+            numSS: transco.numSS,
+            siret: transco.siret,
+            newId: transco.newId,
+            oldId: transco.oldId
+        }
+    })
     return (
         <Container>
             <ContainerBreadCrumb>
@@ -45,18 +59,19 @@ export default async function Page({ params }: { params: { projectSlug: string }
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbLink asChild>
+                                <Link href={`/project/${params.projectSlug}/transco/society`}>Transodification des sociétés</Link>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
                     </BreadcrumbList>
                 </Breadcrumb>
             </ContainerBreadCrumb>
-            <Dashboard projectSlug={params.projectSlug} count={{
-                countDsn,
-                countNumSS,
-                countEstablishment,
-                countSociety,
-                countTranscoPerson,
-                countTranscoWorkContract,
-                countTranscoJob
-            }} />
+            <ContainerDataTable>
+                <CreateTransco projectSlug={params.projectSlug} type="person" buttonLabel="Générer transco matricule" />
+                <DataTable columns={columns} data={transcoPerson} inputSearch="numSS" inputSearchPlaceholder="Chercher par numéro de sécurité sociale" />
+            </ContainerDataTable>
         </Container>
     )
 

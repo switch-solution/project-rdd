@@ -1,10 +1,26 @@
 import { z } from "zod"
-import { zfd } from "zod-form-data";
 
-export const uploadFileSchema = zfd.formData({
-    email: zfd.text(z.string()),
-    file: zfd.file().array(),
-});
+export const TranscoGenerateSchema = z.object({
+    projectSlug: z.string({ required_error: "Le projet est obligatoire." }),
+    type: z.enum(["society", "establishment", "person", "workcontract"], { required_error: "Le type est obligatoire" })
+})
+
+export const TranscoEditSchema = z.object({
+    projectSlug: z.string({ required_error: "Le projet est obligatoire." }),
+    transcoSlug: z.string({ required_error: "Le slug est obligatoire." }),
+    newId: z.string({ required_error: "La nouvelle valeur est obligatoire" }),
+    type: z.enum(["society", "establishment", "person", "workcontract"], { required_error: "Le type est obligatoire" })
+
+})
+
+export const TranscoDeleteSchema = z.object({
+    projectSlug: z.string({ required_error: "Le projet est obligatoire." }),
+    transcoSlug: z.string({ required_error: "Le slug est obligatoire." }),
+    type: z.enum(["society", "establishment", "person", "workcontract"], { required_error: "Le type est obligatoire" })
+
+})
+
+
 
 export const ProjectCreateSchema = z.object({
     label: z.string({ required_error: "Le client est obligatoire." }),

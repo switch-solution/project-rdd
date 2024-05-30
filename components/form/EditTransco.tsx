@@ -4,8 +4,9 @@ import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
-import { createProject } from "@/src/actions/project/project.actions"
-import { ProjectCreateSchema } from "@/src/defintion";
+import type { TypeTransco } from "@/src/helpers/typeTransco"
+import { editTransco } from "@/src/actions/transco/transco.actions"
+import { TranscoEditSchema } from "@/src/defintion";
 import {
     Form,
     FormControl,
@@ -14,33 +15,30 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
-export default function CreateProject({ softwares }: { softwares: { label: string }[] }) {
+export default function EditTransco({ projectSlug, transcoSlug, newId, type }: { projectSlug: string, transcoSlug: string, newId: string | null, type: TypeTransco }) {
     const [loading, setLoading] = useState(false)
-    const form = useForm<z.infer<typeof ProjectCreateSchema>>({
-        resolver: zodResolver(ProjectCreateSchema),
+
+    const form = useForm<z.infer<typeof TranscoEditSchema>>({
+        resolver: zodResolver(TranscoEditSchema),
         defaultValues: {
-            label: "",
-            description: "",
-            softwareLabel: ""
+            projectSlug,
+            transcoSlug,
+            type: type,
+            newId: newId || "",
+
         },
     })
 
-    const onSubmit = async (data: z.infer<typeof ProjectCreateSchema>) => {
+    const onSubmit = async (data: z.infer<typeof TranscoEditSchema>) => {
         try {
+            TranscoEditSchema
             setLoading(true)
-            const action = await createProject(data)
+            const action = await editTransco(data)
             if (action?.serverError) {
                 setLoading(false)
-                toast(`${action.serverError}`, {
+                toast.error(`${action.serverError}`, {
                     description: new Date().toLocaleDateString(),
                     action: {
                         label: "fermer",
@@ -62,12 +60,11 @@ export default function CreateProject({ softwares }: { softwares: { label: strin
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 <FormField
                     control={form.control}
-                    name="label"
+                    name="projectSlug"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Nom de votre projet</FormLabel>
                             <FormControl>
-                                <Input placeholder="Mon nouveau projet" required {...field} />
+                                <Input type="hidden" placeholder="Mon nouveau projet" required {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -77,12 +74,11 @@ export default function CreateProject({ softwares }: { softwares: { label: strin
                 />
                 <FormField
                     control={form.control}
-                    name="description"
+                    name="type"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Description de votre projet</FormLabel>
                             <FormControl>
-                                <Input placeholder="Mon nouveau projet" required {...field} />
+                                <Input type="hidden" placeholder="Mon nouveau projet" required {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -92,28 +88,39 @@ export default function CreateProject({ softwares }: { softwares: { label: strin
                 />
                 <FormField
                     control={form.control}
-                    name="softwareLabel"
+                    name="transcoSlug"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Logciel</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                <FormControl>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Selectionner un logiciel" />
-                                    </SelectTrigger>
-                                </FormControl>
-                                <SelectContent>
-                                    {softwares.map((item) => (<SelectItem key={item.label} value={item.label}>{item.label}</SelectItem>))}
-                                </SelectContent>
-                            </Select>
+                            <FormControl>
+                                <Input type="hidden" required {...field} />
+                            </FormControl>
                             <FormMessage />
                         </FormItem>
+
                     )}
+
                 />
+                <FormField
+                    control={form.control}
+                    name="newId"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Nouveau code</FormLabel>
+                            <FormControl>
+                                <Input placeholder="0001" required {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+
+                    )}
+
+                />
+
                 <Button type="submit" disabled={loading}>Envoyer</Button>
 
             </form>
         </Form>
+
 
     )
 }

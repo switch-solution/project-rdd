@@ -6,18 +6,21 @@ export class Logger {
         level,
         message,
         userId,
+        projectId
 
     }: {
         level: 'info' | 'error' | 'security',
         message: string,
-        userId: string
+        userId: string,
+        projectId?: string | null
     }) => {
         try {
             await prisma.logger.create({
                 data: {
                     level,
                     message,
-                    createdBy: userId
+                    createdBy: userId,
+                    projectId
                 }
 
             })

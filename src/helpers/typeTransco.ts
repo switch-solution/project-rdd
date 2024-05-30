@@ -1,0 +1,1 @@
+export type TypeTransco = 'society' | 'establishment' | 'person' | 'workcontract'

@@ -1,4 +1,4 @@
-import { Container, ContainerBreadCrumb } from "@/components/container/Container";
+import { Container, ContainerBreadCrumb, ContainerForm } from "@/components/container/Container";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -7,12 +7,18 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { Dashboard } from "@/components/Dashboard";
 import { auth } from "@/lib/auth";
 import { Project } from "@/src/class/project";
+import { Transco } from "@/src/class/transco";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-export default async function Page({ params }: { params: { projectSlug: string } }) {
+import EditTransco from "@/components/form/EditTransco";
+export default async function Page({ params }: { params: { projectSlug: string, props: [] } }) {
+    const type = params.props.at(0)
+    const slug = params.props.at(1)
+    if (!type || !slug) {
+        notFound()
+    }
     const session = await auth()
     if (!session?.user?.id) {
         throw new Error('Vous n\'êtes pas connecté')
@@ -27,7 +33,9 @@ export default async function Page({ params }: { params: { projectSlug: string }
     if (!authorization) {
         throw new Error('Vous n\'avez pas accès à ce projet')
     }
-    const { countDsn, countNumSS, countEstablishment, countSociety, countTranscoJob, countTranscoPerson, countTranscoWorkContract } = await project.count()
+    const transco = new Transco(slug, type)
+    const getTransco = await transco.getTransco()
+
     return (
         <Container>
             <ContainerBreadCrumb>
@@ -45,18 +53,24 @@ export default async function Page({ params }: { params: { projectSlug: string }
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbLink asChild>
+                                <Link href={`/project/${params.projectSlug}/transco/society`}>Transodification des sociétés</Link>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbLink asChild>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
                     </BreadcrumbList>
                 </Breadcrumb>
             </ContainerBreadCrumb>
-            <Dashboard projectSlug={params.projectSlug} count={{
-                countDsn,
-                countNumSS,
-                countEstablishment,
-                countSociety,
-                countTranscoPerson,
-                countTranscoWorkContract,
-                countTranscoJob
-            }} />
+            <ContainerForm>
+                <EditTransco projectSlug={params.projectSlug} transcoSlug={slug} newId={getTransco.newId} type={type} />
+            </ContainerForm>
+
         </Container>
     )
 

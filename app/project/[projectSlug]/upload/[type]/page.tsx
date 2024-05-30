@@ -1,4 +1,7 @@
-import { Container, ContainerBreadCrumb } from "@/components/container/Container";
+import { auth } from "@/lib/auth";
+import { Project } from "@/src/class/project";
+import { notFound } from "next/navigation";
+import { Container, ContainerBreadCrumb, ContainerForm } from "@/components/container/Container";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -7,12 +10,9 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { Dashboard } from "@/components/Dashboard";
-import { auth } from "@/lib/auth";
-import { Project } from "@/src/class/project";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-export default async function Page({ params }: { params: { projectSlug: string } }) {
+import UploadFileDsn from "@/components/form/UploadDsn";
+export default async function Page({ params }: { params: { projectSlug: string, type: string } }) {
     const session = await auth()
     if (!session?.user?.id) {
         throw new Error('Vous n\'êtes pas connecté')
@@ -27,7 +27,6 @@ export default async function Page({ params }: { params: { projectSlug: string }
     if (!authorization) {
         throw new Error('Vous n\'avez pas accès à ce projet')
     }
-    const { countDsn, countNumSS, countEstablishment, countSociety, countTranscoJob, countTranscoPerson, countTranscoWorkContract } = await project.count()
     return (
         <Container>
             <ContainerBreadCrumb>
@@ -45,18 +44,18 @@ export default async function Page({ params }: { params: { projectSlug: string }
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbLink asChild>
+                                <Link href={`/project/${params.projectSlug}/upload/${params.type}`}>{params.type}</Link>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
                     </BreadcrumbList>
                 </Breadcrumb>
             </ContainerBreadCrumb>
-            <Dashboard projectSlug={params.projectSlug} count={{
-                countDsn,
-                countNumSS,
-                countEstablishment,
-                countSociety,
-                countTranscoPerson,
-                countTranscoWorkContract,
-                countTranscoJob
-            }} />
+            <ContainerForm>
+                <UploadFileDsn projectSlug={params.projectSlug} />
+            </ContainerForm>
         </Container>
     )
 
