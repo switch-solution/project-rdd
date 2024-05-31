@@ -14,7 +14,8 @@ export class Transco {
                     return await prisma.transco_Society.findUniqueOrThrow({
                         where: {
                             slug: this.slug
-                        }
+                        },
+
                     })
                     break;
                 case "establishment":
@@ -45,6 +46,70 @@ export class Transco {
             throw new Error('Erreur lors de la récupération de la transcodification')
         }
 
+    }
+
+    newIdExist = async (newId: string, projectId: string) => {
+        try {
+            switch (this.type) {
+                case "society":
+                    const society = await prisma.transco_Society.findFirst({
+                        where: {
+                            newId: newId,
+                            projectId
+                        }
+                    })
+                    if (society) {
+                        return true
+                    } else {
+                        return false
+                    }
+                    break;
+                case "establishment":
+                    const establishment = await prisma.transco_Establishment.findFirst({
+                        where: {
+                            newId: newId,
+                            projectId
+                        }
+                    })
+                    if (establishment) {
+                        return true
+                    } else {
+                        return false
+                    }
+                    break;
+                case "person":
+                    const person = await prisma.transco_Person.findFirst({
+                        where: {
+                            newId: newId,
+                            projectId
+                        }
+                    })
+                    if (person) {
+                        return true
+                    } else {
+                        return false
+                    }
+                    break;
+                case "workcontract":
+                    const workContract = await prisma.transco_WorkContract.findFirst({
+                        where: {
+                            newId: newId,
+                            projectId
+                        }
+                    })
+                    if (workContract) {
+                        return true
+                    } else {
+                        return false
+                    }
+
+                    break;
+                default: throw new Error('Type de transcodification inconnu')
+            }
+        } catch (err) {
+            console.error(err)
+            throw new Error('Erreur lors de la suppression de la transcodification')
+        }
     }
 
     editTransco = async (newId: string) => {
@@ -94,7 +159,7 @@ export class Transco {
             }
         } catch (err) {
             console.error(err)
-            throw new Error('Erreur lors de la suppression de la transcodification')
+            throw new Error('Erreur lors de l\'edition de la transcodification')
         }
     }
 

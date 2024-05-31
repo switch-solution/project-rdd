@@ -95,7 +95,7 @@ export default function CreateProject({ softwares }: { softwares: { label: strin
                     name="softwareLabel"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Logciel</FormLabel>
+                            <FormLabel>Logiciel</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                     <SelectTrigger>

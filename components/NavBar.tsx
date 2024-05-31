@@ -50,6 +50,16 @@ export default async function NavBar() {
                             <TooltipContent side="right">Accueil</TooltipContent>
                             <TooltipTrigger asChild>
                                 <Link
+                                    href="/file"
+                                    className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:size-8"
+                                >
+                                    <Pencil className="size-5" />
+                                    <span className="sr-only">Paramétrage</span>
+                                </Link>
+                            </TooltipTrigger>
+                            <TooltipContent side="right">Paramétrage</TooltipContent>
+                            <TooltipTrigger asChild>
+                                <Link
                                     href="/user"
                                     className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:size-8"
                                 >

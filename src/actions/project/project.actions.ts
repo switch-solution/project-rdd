@@ -12,7 +12,7 @@ export const createProject = action(ProjectCreateSchema, async (values: z.infer<
     if (!userId) {
         throw new ActionError("Vous devez être connecté pour effectuer cette action.");
     }
-    let project
+    let project: { id: string, slug: string }
     try {
         const countProject = await prisma.project.count()
         project = await prisma.project.create({
@@ -37,6 +37,90 @@ export const createProject = action(ProjectCreateSchema, async (values: z.infer<
             level: 'info',
             message: `Le projet ${label} a été créé`,
             userId
+        })
+
+        const file = await prisma.file.findMany({
+            where: {
+                softwareLabel: softwareLabel
+            },
+            include: {
+                Column: {
+                    include: {
+                        Row: true
+                    }
+                }
+            }
+        })
+        await prisma.project_File.createMany({
+            data: file.map((file) => {
+                return {
+                    fileLabel: file.label,
+                    fileFormat: file.fileFormat,
+                    projectId: project.id,
+                    softwareLabel: softwareLabel,
+                    createdBy: userId,
+                    separator: file.separator,
+                    iteratorLabel: file.iteratorLabel,
+
+                }
+            })
+        })
+
+        await prisma.project_Column.createMany({
+            data: file.map((file) => {
+                return file.Column.map((column) => {
+                    return {
+                        columnLabel: column.label,
+                        projectId: project.id,
+                        createdBy: userId,
+                        softwareLabel: softwareLabel,
+                        fileLabel: file.label,
+                        label: column.label,
+                        type: column.type,
+                        min: column.min,
+                        max: column.max,
+                        minLength: column.minLength,
+                        maxLength: column.maxLength,
+                        order: column.order,
+                        standardFieldLabel: column.standardFieldLabel,
+
+                    }
+                })
+
+            }).flat(1)
+
+        })
+        const rows = file.map((file) => {
+            return file.Column.map((column) => {
+                return column.Row.map((row) => {
+                    return {
+                        projectId: project.id,
+                        createdBy: userId,
+                        softwareLabel: softwareLabel,
+                        fileLabel: file.label,
+                        columnLabel: column.label,
+                        order: row.order,
+                        value: row.value
+                    }
+                })
+            })
+        })
+        await prisma.project_Row.createMany({
+            data: file.map((file) => {
+                return file.Column.map((column) => {
+                    return column.Row.map((row) => {
+                        return {
+                            projectId: project.id,
+                            createdBy: userId,
+                            softwareLabel: softwareLabel,
+                            fileLabel: file.label,
+                            columnLabel: column.label,
+                            order: row.order,
+                            value: row.value
+                        }
+                    })
+                })
+            }).flat(2)
         })
 
     } catch (err: unknown) {

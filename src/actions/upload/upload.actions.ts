@@ -143,6 +143,17 @@ export const uploadFileDsn = authorizationProject(dsnDataSchema, async (values: 
             }
 
         })
+        await prisma.dsn_Value_Exist.create({
+            data: {
+                dsnId: dsnId.id,
+                projectId: projectId,
+                dsnMonth: dsnDetail.month,
+                table: 'Society',
+                fieldLabel: 'siren',
+                exist: true,
+                value: dsnSociety.siren
+            }
+        })
         await prisma.establishment.create({
             data: {
                 nic: dsnEstablishment.nic,
@@ -154,6 +165,17 @@ export const uploadFileDsn = authorizationProject(dsnDataSchema, async (values: 
                 siren: dsnSociety.siren,
                 dsnId: dsnId.id,
                 projectId: projectId
+            }
+        })
+        await prisma.dsn_Value_Exist.create({
+            data: {
+                dsnId: dsnId.id,
+                projectId: projectId,
+                dsnMonth: dsnDetail.month,
+                table: 'Establishment',
+                fieldLabel: 'nic',
+                exist: true,
+                value: dsnEstablishment.nic
             }
         })
         const persons = employees.map((employee) => {
@@ -170,6 +192,20 @@ export const uploadFileDsn = authorizationProject(dsnDataSchema, async (values: 
         })
         await prisma.person.createMany({
             data: persons
+        })
+        const personExist = persons.map((person) => {
+            return {
+                dsnId: dsnId.id,
+                projectId: projectId,
+                dsnMonth: dsnDetail.month,
+                table: 'Person',
+                fieldLabel: 'numSS',
+                exist: true,
+                value: person.numSS
+            }
+        })
+        await prisma.dsn_Value_Exist.createMany({
+            data: personExist
         })
         const workContractsList = workContracts.map((workContract) => {
             return {

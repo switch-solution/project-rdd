@@ -27,7 +27,9 @@ export default async function Page({ params }: { params: { projectSlug: string }
     if (!authorization) {
         throw new Error('Vous n\'avez pas accès à ce projet')
     }
-    const { countDsn, countNumSS, countEstablishment, countSociety, countTranscoJob, countTranscoPerson, countTranscoWorkContract } = await project.count()
+    const { countDsn, countNumSS, countEstablishment, countSociety, countTranscoJob, countTranscoPerson, countTranscoWorkContract, countExtraction } = await project.count()
+    const projectFile = await project.getFiles()
+    const extractions = await project.getExtraction()
     return (
         <Container>
             <ContainerBreadCrumb>
@@ -48,15 +50,21 @@ export default async function Page({ params }: { params: { projectSlug: string }
                     </BreadcrumbList>
                 </Breadcrumb>
             </ContainerBreadCrumb>
-            <Dashboard projectSlug={params.projectSlug} count={{
-                countDsn,
-                countNumSS,
-                countEstablishment,
-                countSociety,
-                countTranscoPerson,
-                countTranscoWorkContract,
-                countTranscoJob
-            }} />
+            <Dashboard
+                projectSlug={params.projectSlug}
+                count={{
+                    countDsn,
+                    countNumSS,
+                    countEstablishment,
+                    countSociety,
+                    countTranscoPerson,
+                    countTranscoWorkContract,
+                    countTranscoJob,
+                    countExtraction
+                }}
+                files={projectFile}
+                extrations={extractions}
+            />
         </Container>
     )
 

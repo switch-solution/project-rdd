@@ -199,6 +199,7 @@ export const createTranscoWorkcontract = authorizationProject(TranscoGenerateSch
                     nic: workContract.nic,
                     contractId: workContract.contractId,
                     projectId,
+                    employeeId: person?.employeeId ? person.employeeId : "",
                     createdBy: userId,
                     siret: `${workContract.siren}${workContract.nic}`,
                     firstname: person?.firstname ? person.firstname : "",
@@ -233,6 +234,10 @@ export const editTransco = authorizationProject(TranscoEditSchema, async (values
     const { projectSlug, transcoSlug, newId, type } = TranscoEditSchema.parse(values)
     const transco = new Transco(transcoSlug, type)
     try {
+        const newIdExist = await transco.newIdExist(newId, projectId)
+        if (newIdExist) {
+            throw new ActionError("La valeur existe déjà")
+        }
         await transco.editTransco(newId)
         const logger = new Logger()
         await logger.writeLog({

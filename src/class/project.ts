@@ -76,6 +76,13 @@ export class Project extends Logger {
                     }
                 }
             })
+            const countExtraction = await prisma.extraction.count({
+                where: {
+                    Project: {
+                        slug: this.slug
+                    }
+                }
+            })
             return {
                 countDsn,
                 countNumSS: countNumSS.length,
@@ -85,11 +92,46 @@ export class Project extends Logger {
                 countTranscoSociety,
                 countTranscoPerson,
                 countTranscoWorkContract,
-                countTranscoJob
+                countTranscoJob,
+                countExtraction
             }
         } catch (err) {
             console.error(err)
             throw new Error('Erreur lors de la récupération du projet')
+        }
+    }
+
+    getTransco = async () => {
+        try {
+            const transcoSociety = await prisma.transco_Society.findMany({
+                where: {
+                    Project: {
+                        slug: this.slug
+                    }
+                }
+            })
+            const transcoEstablishment = await prisma.transco_Establishment.findMany({
+                where: {
+                    Project: {
+                        slug: this.slug
+                    }
+                }
+            })
+            const transcoPerson = await prisma.transco_Person.findMany({
+                where: {
+                    Project: {
+                        slug: this.slug
+                    }
+                }
+            })
+            return {
+                transcoSociety,
+                transcoEstablishment,
+                transcoPerson
+            }
+        } catch (err) {
+            console.error(err)
+            throw new Error('Erreur lors de la récupération des transcodifications')
         }
     }
 
@@ -107,6 +149,24 @@ export class Project extends Logger {
             throw new Error('Erreur lors de la récupération du projet')
         }
 
+    }
+    getExtraction = async () => {
+        try {
+            const extraction = await prisma.extraction.findMany({
+                where: {
+                    Project: {
+                        slug: this.slug
+                    }
+                },
+                orderBy: {
+                    createdAt: 'asc'
+                }
+            })
+            return extraction
+        } catch (err) {
+            console.error(err)
+            throw new Error('Erreur lors de la récupération des extractions')
+        }
     }
     userExist = async (userId: string) => {
         try {
@@ -138,6 +198,46 @@ export class Project extends Logger {
 
     }
 
+    getAllDsn = async (value: string) => {
+        try {
+            const dsn = await prisma.dsn_Value_Exist.findMany({
+                where: {
+                    value: value,
+                    Project: {
+                        slug: this.slug
+                    },
+                },
+                orderBy: {
+                    createdAt: 'asc'
+                }
+            })
+            return dsn
+        } catch (err) {
+            console.error(err)
+            throw new Error('Erreur lors de la récupération des DSN')
+        }
+    }
+
+    getLastDsn = async (value: string) => {
+        try {
+            const dsn = await prisma.dsn_Value_Exist.findFirstOrThrow({
+                where: {
+                    value: value,
+                    Project: {
+                        slug: this.slug
+                    },
+                },
+                orderBy: {
+                    createdAt: 'desc'
+                }
+            })
+            return dsn
+        } catch (err) {
+            console.error(err)
+            throw new Error('Erreur lors de la récupération de la dernière DSN')
+        }
+    }
+
     getTranscoJob = async () => {
         try {
             const transcoJob = await prisma.transco_Job.findMany({
@@ -161,6 +261,9 @@ export class Project extends Logger {
                     Project: {
                         slug: this.slug
                     }
+                },
+                orderBy: {
+                    siren: 'asc'
                 }
             })
             return transcoSociety
@@ -177,6 +280,9 @@ export class Project extends Logger {
                     Project: {
                         slug: this.slug
                     }
+                },
+                orderBy: {
+                    nic: 'asc'
                 }
             })
             return transcoEstablishment
@@ -195,6 +301,9 @@ export class Project extends Logger {
                     Project: {
                         slug: this.slug
                     }
+                },
+                orderBy: {
+                    numSS: 'asc'
                 }
             })
             return transcoPerson
@@ -211,6 +320,9 @@ export class Project extends Logger {
                     Project: {
                         slug: this.slug
                     }
+                },
+                orderBy: {
+                    numSS: 'asc'
                 }
             })
             return transcoWorkContract
@@ -219,6 +331,25 @@ export class Project extends Logger {
             throw new Error('Erreur lors de la récupération des transcodifications')
         }
 
+    }
+
+    getFiles = async () => {
+        try {
+            const projectFiles = await prisma.project_File.findMany({
+                where: {
+                    Project: {
+                        slug: this.slug
+                    }
+                },
+                orderBy: {
+                    fileLabel: 'asc'
+                }
+            })
+            return projectFiles
+        } catch (err) {
+            console.error(err)
+            throw new Error('Erreur lors de la récupération des fichiers')
+        }
     }
 
 }

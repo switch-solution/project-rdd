@@ -20,10 +20,40 @@ export const TranscoDeleteSchema = z.object({
 
 })
 
+export const ExtractionCreateSchema = z.object({
+    label: z.string({ required_error: "Le label est obligatoire." }).min(1, { message: "Le label est obligatoire." }),
+    projectSlug: z.string({ required_error: "Le projet est obligatoire." }),
+    description: z.string().optional(),
+})
 
 
 export const ProjectCreateSchema = z.object({
     label: z.string({ required_error: "Le client est obligatoire." }),
     description: z.string().optional(),
     softwareLabel: z.string({ required_error: "Le logiciel est obligatoire." }).min(1, { message: "Le logiciel est obligatoire." }),
+})
+
+export const ProjectColumnEditSchema = z.object({
+    projectSlug: z.string({ required_error: "Le projet est obligatoire." }),
+    fileSlug: z.string({ required_error: "Le fichier est obligatoire." }),
+    columnSlug: z.string({ required_error: "La colonne est obligatoire." }),
+    label: z.string({ required_error: "Le label est obligatoire." }),
+    type: z.enum(["string", "integer", "float", "date"], { required_error: "Le type est obligatoire." }),
+    standardFieldLabel: z.string().optional(),
+    defaultValue: z.string().optional(),
+    isRequired: z.boolean(),
+    order: z.coerce.number().int(),
+    min: z.number().optional(),
+    max: z.number().optional(),
+    minLength: z.number().optional(),
+    maxLength: z.number().optional(),
+
+
+})
+
+export const TranformCreateSchema = z.object({
+    projectSlug: z.string({ required_error: "Le projet est obligatoire." }),
+    projectFileSlug: z.string({ required_error: "Le fichier est obligatoire." }),
+    extractionSlug: z.string({ required_error: "L'extraction est obligatoire." }),
+    id: z.string({ required_error: "L'id est obligatoire." }),
 })

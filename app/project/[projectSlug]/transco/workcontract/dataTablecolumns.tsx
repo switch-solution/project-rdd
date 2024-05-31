@@ -1,25 +1,51 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowRight, Pencil, Trash } from "lucide-react"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
+import { Pencil } from "lucide-react"
 import Link from "next/link"
-export type Society = {
+import AlertDeleteTransco from "@/components/AlertDeleteTransco"
+
+export type WorkContract = {
     projectSlug: string
-    slug: string | null
-    siren: string | null
+    slug: string
+    numSS: string
+    siret: string | null
+    employeeId: string | null
+    lastname: string | null
+    firstname: string | null
+    contractId: string | null
     newId: string | null
 
 }
 
-export const columns: ColumnDef<Society>[] = [
+export const columns: ColumnDef<WorkContract>[] = [
     {
-        accessorKey: "siren",
-        header: "SIREN",
+        accessorKey: "siret",
+        header: "SIRET",
+    },
+    {
+        accessorKey: "numSS",
+        header: "Numéro de sécurité sociale",
+    },
+    {
+        accessorKey: "employeeId",
+        header: "Matricule salarié",
+    },
+    {
+        accessorKey: "lastname",
+        header: "Nom",
+    },
+    {
+        accessorKey: "firstname",
+        header: "Prénom",
+    },
+    {
+        accessorKey: "contractId",
+        header: "Numéro de contrat DSN",
     },
     {
         accessorKey: "newId",
-        header: "Code société",
+        header: "Nouveau numéro de contrat interne",
     },
     {
         header: "Editer",
@@ -37,12 +63,11 @@ export const columns: ColumnDef<Society>[] = [
         id: 'delete',
         cell: ({ row }) => {
             return (
-                <Link href={`/project/${row.original.projectSlug}/transco/society/${row.original.slug}/edit`}>
-                    <Trash />
-                </Link>
+                <AlertDeleteTransco projectSlug={row.original.projectSlug} transcoSlug={row.original.slug} type='workcontract' />
             )
         }
     },
+
 
 
 ]

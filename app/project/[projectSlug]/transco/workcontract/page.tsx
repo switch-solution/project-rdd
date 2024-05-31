@@ -29,13 +29,19 @@ export default async function Page({ params }: { params: { projectSlug: string }
     if (!authorization) {
         throw new Error('Vous n\'avez pas accès à ce projet')
     }
-    const transcoSocietyList = await project.getTranscoSociety()
-    const transcoSociety = transcoSocietyList.map((transco) => {
+    const transcoWorkContractList = await project.getTranscoWorkContract()
+    const transcoWorkContract = transcoWorkContractList.map((transco) => {
         return {
             projectSlug: params.projectSlug,
             slug: transco.slug,
-            siren: transco.siren,
-            newId: transco.newId
+            lastname: transco.lastname,
+            firstname: transco.firstname,
+            siret: transco.siret,
+            contractId: transco.contractId,
+            newId: transco.newId,
+            numSS: transco.numSS,
+            employeeId: transco.employeeId
+
         }
     })
     return (
@@ -57,7 +63,7 @@ export default async function Page({ params }: { params: { projectSlug: string }
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
                             <BreadcrumbLink asChild>
-                                <Link href={`/project/${params.projectSlug}/transco/society`}>Transodification des sociétés</Link>
+                                <Link href={`/project/${params.projectSlug}/transco/workcontract`}>Transodification des contrats</Link>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
@@ -65,8 +71,8 @@ export default async function Page({ params }: { params: { projectSlug: string }
                 </Breadcrumb>
             </ContainerBreadCrumb>
             <ContainerDataTable>
-                <CreateTransco projectSlug={params.projectSlug} type="society" buttonLabel="Générer transco des contrats" />
-                <DataTable columns={columns} data={transcoSociety} inputSearch="label" inputSearchPlaceholder="Chercher par libellé" />
+                <CreateTransco projectSlug={params.projectSlug} type='workcontract' buttonLabel="Générer transco des contrats" />
+                <DataTable columns={columns} data={transcoWorkContract} inputSearch="numSS" inputSearchPlaceholder="Chercher par numéro de sécurité sociale" />
             </ContainerDataTable>
         </Container>
     )

@@ -114,17 +114,197 @@ model Project {
     Transco_WorkContract  Transco_WorkContract[]
     Transco_Job           Transco_Job[]
     Logger                Logger[]
+    Project_File          Project_File[]
+    Project_Column        Project_Column[]
+    Project_Row           Project_Row[]
+    Extraction            Extraction[]
+    Extraction_Data       Extraction_Data[]
+    Dsn_Value_Exist       Dsn_Value_Exist[]
+    Extraction_File       Extraction_File[]
 }
 
 model Software {
-    label      String    @id
-    provider   String
-    isArchived Boolean   @default(false)
-    slug       String    @unique
-    createdAt  DateTime  @default(now())
-    updatedAt  DateTime  @updatedAt
-    createdBy  String    @default("system")
-    Project    Project[]
+    label           String            @id
+    provider        String
+    isArchived      Boolean           @default(false)
+    slug            String            @unique
+    createdAt       DateTime          @default(now())
+    updatedAt       DateTime          @updatedAt
+    createdBy       String            @default("system")
+    Project         Project[]
+    File            File[]
+    Extraction_Data Extraction_Data[]
+}
+
+model Iterator {
+    label                   String                    @id
+    description             String?
+    createdAt               DateTime                  @default(now())
+    updatedAt               DateTime                  @updatedAt
+    createdBy               String                    @default("system")
+    File                    File[]
+    Project_File            Project_File[]
+    Iterator_Standard_Field Iterator_Standard_Field[]
+}
+
+model Iterator_Standard_Field {
+    iteratorLabel String
+    Iterator      Iterator       @relation(fields: [iteratorLabel], references: [label])
+    fieldLabel    String
+    Field         Standard_Field @relation(fields: [fieldLabel], references: [label])
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
+    createdBy     String         @default("system")
+
+    @@id([iteratorLabel, fieldLabel])
+}
+
+model Standard_Field {
+    table                   String
+    field                   String
+    type                    String
+    label                   String                    @id
+    min                     Int?
+    max                     Int?
+    minLength               Int?
+    maxLength               Int?
+    format                  String?
+    createdAt               DateTime                  @default(now())
+    updatedAt               DateTime                  @updatedAt
+    createdBy               String                    @default("system")
+    Iterator_Standard_Field Iterator_Standard_Field[]
+    Column                  Column[]
+    Project_Column          Project_Column[]
+}
+
+model File {
+    label         String
+    softwareLabel String
+    Software      Software       @relation(fields: [softwareLabel], references: [label])
+    description   String?
+    fileFormat    String         @default("csv")
+    separator     String         @default(";")
+    maxRows       Int            @default(99999)
+    slug          String         @unique
+    iteratorLabel String
+    history       Boolean        @default(false)
+    Iterator      Iterator       @relation(fields: [iteratorLabel], references: [label])
+    createdAt     DateTime       @default(now())
+    updatedAt     DateTime       @updatedAt
+    createdBy     String         @default("system")
+    Column        Column[]
+    Project_File  Project_File[]
+
+    @@id([label, softwareLabel])
+}
+
+model Project_File {
+    projectId       String
+    Project         Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    fileLabel       String
+    softwareLabel   String
+    fileFormat      String
+    separator       String
+    iteratorLabel   String
+    history         Boolean           @default(false)
+    Iterator        Iterator          @relation(fields: [iteratorLabel], references: [label])
+    File            File              @relation(fields: [fileLabel, softwareLabel], references: [label, softwareLabel], onDelete: Cascade)
+    createdAt       DateTime          @default(now())
+    updatedAt       DateTime          @updatedAt
+    createdBy       String
+    slug            String            @unique @default(cuid())
+    Extraction_File Extraction_File[]
+
+    @@id([projectId, fileLabel, softwareLabel])
+}
+
+model Column {
+    fileLabel          String
+    softwareLabel      String
+    File               File             @relation(fields: [fileLabel, softwareLabel], references: [label, softwareLabel], onDelete: Cascade)
+    label              String
+    slug               String           @unique
+    description        String?
+    createdAt          DateTime         @default(now())
+    updatedAt          DateTime         @updatedAt
+    createdBy          String           @default("system")
+    type               String
+    standardFieldLabel String?
+    Standard_Field     Standard_Field?  @relation(fields: [standardFieldLabel], references: [label])
+    order              Int
+    min                Int?
+    max                Int?
+    minLength          Int?
+    maxLength          Int?
+    format             String?
+    isRequired         Boolean          @default(false)
+    defaultValue       String?
+    Row                Row[]
+    Project_Column     Project_Column[]
+
+    @@id([fileLabel, softwareLabel, label])
+    @@unique([fileLabel, softwareLabel, order])
+}
+
+model Project_Column {
+    projectId          String
+    Project            Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    fileLabel          String
+    label              String
+    softwareLabel      String
+    columnLabel        String
+    type               String
+    standardFieldLabel String?
+    Standard_Field     Standard_Field? @relation(fields: [standardFieldLabel], references: [label])
+    min                Int?
+    max                Int?
+    minLength          Int?
+    maxLength          Int?
+    defaultValue       String?
+    isRequired         Boolean         @default(false)
+    order              Int             @default(1)
+    Column             Column          @relation(fields: [fileLabel, softwareLabel, columnLabel], references: [fileLabel, softwareLabel, label], onDelete: Cascade)
+    createdAt          DateTime        @default(now())
+    updatedAt          DateTime        @updatedAt
+    createdBy          String
+    slug               String          @unique @default(cuid())
+
+    @@id([projectId, softwareLabel, fileLabel, columnLabel])
+    @@unique([projectId, softwareLabel, fileLabel, order])
+}
+
+model Row {
+    fileLabel     String
+    softwareLabel String
+    columnLabel   String
+    order         Int           @default(1)
+    Column        Column        @relation(fields: [fileLabel, softwareLabel, columnLabel], references: [fileLabel, softwareLabel, label], onDelete: Cascade)
+    value         String
+    slug          String        @unique
+    description   String?
+    createdAt     DateTime      @default(now())
+    updatedAt     DateTime      @updatedAt
+    createdBy     String        @default("system")
+    Project_Row   Project_Row[]
+
+    @@id([softwareLabel, fileLabel, columnLabel, order])
+}
+
+model Project_Row {
+    projectId     String
+    Project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    Row           Row      @relation(fields: [fileLabel, softwareLabel, columnLabel, order], references: [fileLabel, softwareLabel, columnLabel, order], onDelete: Cascade)
+    fileLabel     String
+    softwareLabel String
+    columnLabel   String
+    order         Int
+    value         String
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    createdBy     String
+    slug          String   @unique @default(cuid())
+
+    @@id([projectId, softwareLabel, fileLabel, columnLabel, order])
 }
 
 model Prisma_Seed {
@@ -151,7 +331,7 @@ model Logger {
 }
 
 model Dsn {
-    id              String          @id @default(cuid())
+    id              String            @id @default(cuid())
     month           String
     dsnVersion      String
     provider        String
@@ -159,17 +339,18 @@ model Dsn {
     softwareVersion String
     totalRows       String
     type            String
-    createdAt       DateTime        @default(now())
-    updatedAt       DateTime        @updatedAt
+    createdAt       DateTime          @default(now())
+    updatedAt       DateTime          @updatedAt
     createdBy       String
     projectId       String
-    Project         Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    Project         Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
     Society         Society[]
     Job             Job[]
     Idcc            Idcc[]
     Person          Person[]
     WorkContract    WorkContract[]
     Establishment   Establishment[]
+    Dsn_Value_Exist Dsn_Value_Exist[]
 }
 
 model Society {
@@ -200,6 +381,7 @@ model Transco_Society {
     slug      String   @unique @default(cuid())
 
     @@id([projectId, siren])
+    @@unique([projectId, newId])
 }
 
 model Establishment {
@@ -235,6 +417,7 @@ model Transco_Establishment {
     slug      String   @unique @default(cuid())
 
     @@id([projectId, siren, nic])
+    @@unique([projectId, newId])
 }
 
 model Person {
@@ -289,6 +472,7 @@ model Transco_Person {
     slug      String   @unique @default(cuid())
 
     @@id([projectId, numSS])
+    @@unique([projectId, newId])
 }
 
 model WorkContract {
@@ -389,11 +573,14 @@ model WorkContract {
 model Transco_WorkContract {
     projectId  String
     Project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    siren      String
+    nic        String
     siret      String
     numSS      String
     firstname  String
     lastname   String
     contractId String
+    employeeId String
     newId      String?
     createdAt  DateTime @default(now())
     updatedAt  DateTime @updatedAt
@@ -401,6 +588,8 @@ model Transco_WorkContract {
     slug       String   @unique @default(cuid())
 
     @@id([projectId, numSS, contractId])
+    @@unique([projectId, siren, newId])
+    @@unique([projectId, numSS, contractId])
 }
 
 model Job {
@@ -439,4 +628,74 @@ model Idcc {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     createdBy String
+}
+
+model Extraction {
+    label           String
+    description     String?
+    projectId       String
+    Project         Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    status          String
+    createdAt       DateTime          @default(now())
+    updatedAt       DateTime          @updatedAt
+    createdBy       String
+    slug            String            @unique
+    Extraction_File Extraction_File[]
+
+    @@id([label, projectId])
+}
+
+model Extraction_File {
+    extractionLabel String
+    Extraction      Extraction        @relation(fields: [extractionLabel, projectId], references: [label, projectId], onDelete: Cascade)
+    fileLabel       String
+    projectId       String
+    Project         Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    createdAt       DateTime          @default(now())
+    updatedAt       DateTime          @updatedAt
+    createdBy       String
+    slug            String            @unique @default(cuid())
+    status          String            @default("En attente")
+    iteratorLabel   String
+    projectFileSlug String
+    Project_File    Project_File      @relation(fields: [projectFileSlug], references: [slug])
+    Extraction_Data Extraction_Data[]
+
+    @@id([extractionLabel, fileLabel, projectId])
+}
+
+model Extraction_Data {
+    projectId       String
+    Project         Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    extractionLabel String
+    Extraction_File Extraction_File @relation(fields: [extractionLabel, fileLabel, projectId], references: [extractionLabel, fileLabel, projectId], onDelete: Cascade)
+    fileLabel       String
+    columnLabel     String
+    columnValue     String
+    rowOrder        Int
+    createdAt       DateTime        @default(now())
+    updatedAt       DateTime        @updatedAt
+    createdBy       String
+    softwareLabel   String
+    Software        Software        @relation(fields: [softwareLabel], references: [label])
+    slug            String          @unique @default(cuid())
+
+    @@id([projectId, extractionLabel, fileLabel, columnLabel, rowOrder])
+}
+
+model Dsn_Value_Exist {
+    dsnId      String
+    Dsn        Dsn      @relation(fields: [dsnId], references: [id], onDelete: Cascade)
+    projectId  String
+    Project    Project  @relation(fields: [projectId], references: [id])
+    dsnMonth   String
+    value      String
+    table      String
+    fieldLabel String
+    exist      Boolean
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+    createdBy  String   @default("system")
+
+    @@id([dsnId, projectId, value])
 }

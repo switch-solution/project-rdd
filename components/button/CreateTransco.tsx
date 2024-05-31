@@ -3,7 +3,17 @@ import { createTranscoSociety, createTranscoEstablishment, createTranscoPerson, 
 import { Button } from "@/components/ui/button";
 import { useDebouncedCallback } from 'use-debounce';
 import { toast } from "sonner"
-
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 export default function CreataTransco({ projectSlug, type, buttonLabel }: { projectSlug: string, type: 'society' | 'establishment' | 'person' | 'workcontract', buttonLabel: string }) {
     const handleClick = useDebouncedCallback(async () => {
         try {
@@ -51,7 +61,24 @@ export default function CreataTransco({ projectSlug, type, buttonLabel }: { proj
 
     }, 1000)
     return (
-        <Button onClick={handleClick}>{buttonLabel}</Button>
+        <AlertDialog>
+            <AlertDialogTrigger asChild>
+                <Button variant="outline">{buttonLabel}</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Confirmez vous le traitement ?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Attention cette opération va supprimer l&apos;ensemble des transcodifications existantes afin de repartir des données sources.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleClick}>Continue</AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+
 
     )
 }

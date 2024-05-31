@@ -61,7 +61,7 @@ export default async function Page({ params }: { params: { projectSlug: string }
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
                             <BreadcrumbLink asChild>
-                                <Link href={`/project/${params.projectSlug}/transco/society`}>Transodification des sociétés</Link>
+                                <Link href={`/project/${params.projectSlug}/transco/person`}>Transodification des matricules</Link>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />

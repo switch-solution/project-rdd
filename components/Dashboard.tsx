@@ -61,7 +61,7 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs"
 
-export function Dashboard({ projectSlug, count }: {
+export function Dashboard({ projectSlug, count, files, extrations }: {
     projectSlug: string, count: {
         countDsn: number,
         countNumSS: number,
@@ -69,9 +69,28 @@ export function Dashboard({ projectSlug, count }: {
         countSociety: number,
         countTranscoPerson: number,
         countTranscoWorkContract: number,
-        countTranscoJob: number
+        countTranscoJob: number,
+        countExtraction: number
 
-    }
+    },
+    files: {
+        projectId: string,
+        fileLabel: string,
+        softwareLabel: string,
+        fileFormat: string,
+        separator: string,
+        iteratorLabel: string,
+        history: boolean,
+        slug: string
+    }[],
+    extrations: {
+        label: string,
+        description: string | null,
+        status: string,
+        slug: string,
+        createdAt: Date
+    }[]
+
 }) {
 
     return (
@@ -108,17 +127,12 @@ export function Dashboard({ projectSlug, count }: {
                     </Card>
                     <Card x-chunk="dashboard-05-chunk-2">
                         <CardHeader className="pb-2">
-                            <CardDescription>Avancement</CardDescription>
-                            <CardTitle className="text-4xl">5</CardTitle>
+                            <CardDescription>Extraction</CardDescription>
+                            <CardTitle>{count.countExtraction}</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-xs text-muted-foreground">
-                                +10% from last month
-                            </div>
+                            <Link href={`/project/${projectSlug}/extraction/create`}><Button>Créer une nouvelle extraction.</Button></Link>
                         </CardContent>
-                        <CardFooter>
-                            <Progress value={50} aria-label="50% increase" />
-                        </CardFooter>
                     </Card>
                 </div>
                 <Tabs defaultValue="import">
@@ -127,6 +141,7 @@ export function Dashboard({ projectSlug, count }: {
                             <TabsTrigger value="import">Import</TabsTrigger>
                             <TabsTrigger value="transco">Transcodication</TabsTrigger>
                             <TabsTrigger value="extraction">Extraction</TabsTrigger>
+                            <TabsTrigger value="param" className="hidden sm:flex">Paramétrage</TabsTrigger>
                         </TabsList>
                         <div className="ml-auto flex items-center gap-2">
                             <DropdownMenu>
@@ -304,7 +319,7 @@ export function Dashboard({ projectSlug, count }: {
                                                 <div className="font-medium">Contrat de travail</div>
                                             </TableCell>
                                             <TableCell className="hidden sm:table-cell">
-                                                <Badge>Obligatoire</Badge>
+                                                <Badge variant='secondary'>Facultatif</Badge>
                                             </TableCell>
                                             <TableCell className="hidden sm:table-cell">
                                                 <Badge className="text-xs" variant="secondary">
@@ -312,7 +327,7 @@ export function Dashboard({ projectSlug, count }: {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="sm:table-cell">
-                                                <Link href={`/project/${projectSlug}/transco/workcontrat`}> <ArrowRight /></Link>
+                                                <Link href={`/project/${projectSlug}/transco/workcontract`}> <ArrowRight /></Link>
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
@@ -347,6 +362,122 @@ export function Dashboard({ projectSlug, count }: {
                                                 <Link href={`/project/${projectSlug}/transco/payrool`}> <ArrowRight /></Link>
                                             </TableCell>
                                         </TableRow>
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+                    <TabsContent value="extraction">
+                        <Card x-chunk="dashboard-05-chunk-3">
+                            <CardHeader className="px-7">
+                                <CardTitle>Extraction</CardTitle>
+                                <CardDescription>
+                                    Run de migration
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Libellé</TableHead>
+                                            <TableHead className="hidden sm:table-cell">
+                                                Description
+                                            </TableHead>
+                                            <TableHead className="hidden sm:table-cell">
+                                                Status
+                                            </TableHead>
+                                            <TableHead className="hidden sm:table-cell">
+                                                Date de création
+                                            </TableHead>
+                                            <TableHead className="sm:table-cell">
+                                                Ouvrir
+                                            </TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {extrations.map(extraction => {
+                                            return (
+                                                <TableRow key={extraction.slug}>
+                                                    <TableCell>
+                                                        <div className="font-medium">{extraction.label}</div>
+                                                    </TableCell>
+                                                    <TableCell className="hidden sm:table-cell">
+                                                        {extraction.description}
+                                                    </TableCell>
+                                                    <TableCell className="hidden sm:table-cell">
+                                                        <Badge className="text-xs" variant="secondary">
+                                                            {extraction.status}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="hidden sm:table-cell">
+                                                        {extraction.createdAt.toLocaleString()}
+                                                    </TableCell>
+                                                    <TableCell className="sm:table-cell">
+                                                        <Link href={`/project/${projectSlug}/extraction/${extraction.slug}`}> <ArrowRight /></Link>
+                                                    </TableCell>
+                                                </TableRow>
+                                            )
+                                        })
+                                        }
+
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+                    <TabsContent value="param">
+                        <Card x-chunk="dashboard-05-chunk-3">
+                            <CardHeader className="px-7">
+                                <CardTitle>Paramétrage</CardTitle>
+                                <CardDescription>
+                                    Détail du paramétrage des fichiers.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Fichier</TableHead>
+                                            <TableHead className="hidden sm:table-cell">
+                                                Format
+                                            </TableHead>
+                                            <TableHead className="hidden sm:table-cell">
+                                                Itération
+                                            </TableHead>
+                                            <TableHead className="hidden sm:table-cell">
+                                                Historique
+                                            </TableHead>
+                                            <TableHead className="sm:table-cell">
+                                                Ouvrir
+                                            </TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {files.map(file => {
+                                            return (
+                                                <TableRow key={file.fileLabel}>
+                                                    <TableCell>
+                                                        <div className="font-medium">{file.fileLabel}</div>
+                                                    </TableCell>
+                                                    <TableCell className="hidden sm:table-cell">
+                                                        {file.fileFormat}
+                                                    </TableCell>
+                                                    <TableCell className="hidden sm:table-cell">
+                                                        {file.iteratorLabel}
+                                                    </TableCell>
+                                                    <TableCell className="hidden sm:table-cell">
+                                                        <Badge className="text-xs" variant={file.history ? "default" : "secondary"}>
+                                                            {file.history ? 'Historique' : 'Pas d\'historique'}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="sm:table-cell">
+                                                        <Link href={`/project/${projectSlug}/param/${file.slug}`}> <ArrowRight /></Link>
+                                                    </TableCell>
+                                                </TableRow>
+
+                                            )
+                                        })}
+
                                     </TableBody>
                                 </Table>
                             </CardContent>
@@ -400,6 +531,13 @@ export function Dashboard({ projectSlug, count }: {
                             <li className="flex items-center justify-between">
                                 <span className="text-muted-foreground">Nombre unique de numéro de Sécurité Sociale</span>
                                 <span>{count.countNumSS}</span>
+                            </li>
+                        </ul>
+                        <Separator className="my-2" />
+                        <ul className="grid gap-3">
+                            <li className="flex items-center justify-between">
+                                <span className="text-muted-foreground">Nombre de run de migration</span>
+                                <span>{count.countExtraction}</span>
                             </li>
                         </ul>
                     </div>
