@@ -24,11 +24,12 @@ import {
 
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
-export default function EditProjectColumn({ projectSlug, fileSlug, columnSlug, column, standardFields }: {
+export default function EditProjectColumn({ projectSlug, fileSlug, columnSlug, column, standardFields, formatList }: {
     projectSlug: string, fileSlug: string, columnSlug: string
     column: {
         label: string,
         type: string,
+        format: string | null,
         standardFieldLabel: string | null,
         defaultValue?: string | null,
         isRequired: boolean,
@@ -40,6 +41,10 @@ export default function EditProjectColumn({ projectSlug, fileSlug, columnSlug, c
     },
     standardFields: {
         fieldLabel: string,
+    }[],
+    formatList: {
+        type: string,
+        format: string,
     }[]
 }) {
     const [loading, setLoading] = useState(false)
@@ -49,6 +54,7 @@ export default function EditProjectColumn({ projectSlug, fileSlug, columnSlug, c
             projectSlug,
             fileSlug,
             columnSlug,
+            format: column.format ? column.format : undefined,
             label: column.label,
             type: column.type as 'string' | 'integer' | 'float' | 'date',
             standardFieldLabel: column.standardFieldLabel ? column.standardFieldLabel : undefined,
@@ -213,6 +219,29 @@ export default function EditProjectColumn({ projectSlug, fileSlug, columnSlug, c
                                     <SelectItem value="integer">Entier</SelectItem>
                                     <SelectItem value="float">Décimale</SelectItem>
                                     <SelectItem value="date">Date</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="format"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Format</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Selectionner un type de champ" />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {formatList.filter(type => type.type === form.getValues("type")).map(format => {
+                                        return <SelectItem key={format.format} value={format.format}>{format.format}</SelectItem>
+                                    })}
+
                                 </SelectContent>
                             </Select>
                             <FormMessage />

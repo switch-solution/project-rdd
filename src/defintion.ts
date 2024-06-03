@@ -1,3 +1,4 @@
+import { format } from "path"
 import { z } from "zod"
 
 export const TranscoGenerateSchema = z.object({
@@ -47,6 +48,7 @@ export const ProjectColumnEditSchema = z.object({
     max: z.number().optional(),
     minLength: z.number().optional(),
     maxLength: z.number().optional(),
+    format: z.string().optional(),
 
 
 })

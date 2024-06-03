@@ -181,7 +181,6 @@ export const uploadFileDsn = authorizationProject(dsnDataSchema, async (values: 
         const persons = employees.map((employee) => {
             return {
                 ...employee,
-                birthday: convertToDate(employee.birthday),
                 projectId: projectId,
                 createdBy: userId,
                 dsnId: dsnId.id,

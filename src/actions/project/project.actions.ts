@@ -6,6 +6,7 @@ import z from 'zod';
 import { action, ActionError } from '@/lib/safe-actions';
 import { prisma } from '@/lib/prisma';
 import { Logger } from '@/src/class/logger';
+import { format } from 'path';
 export const createProject = action(ProjectCreateSchema, async (values: z.infer<typeof ProjectCreateSchema>, { userId }) => {
 
     const { label, description, softwareLabel } = ProjectCreateSchema.parse(values);
@@ -77,6 +78,7 @@ export const createProject = action(ProjectCreateSchema, async (values: z.infer<
                         fileLabel: file.label,
                         label: column.label,
                         type: column.type,
+                        format: column.format,
                         min: column.min,
                         max: column.max,
                         minLength: column.minLength,

@@ -2,15 +2,17 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import ButtonStartMigration from "@/components/button/ButtonStartMigration"
+import Link from "next/link"
 export type Extraction = {
     projectSlug: string
     extractionSlug: string
     projectFileSlug: string
-    fileLabel: string | null
+    fileLabel: string
     status: string | null
     countValue: number | null
     iteratorLabel: string
     idList: string[]
+    extractionFileSlug: string
 
 }
 
@@ -54,6 +56,15 @@ export const columns: ColumnDef<Extraction>[] = [
             )
         }
     },
+    {
+        header: "Exporter au format Excel",
+        id: 'excel',
+        cell: ({ row }) => {
+            return (
+                <Link href={`/project/${row.original.projectSlug}/extraction/${row.original.extractionSlug}/data/${row.original.extractionFileSlug}`}>Excel</Link>
+            )
+        }
+    }
 
 
 ]

@@ -63,6 +63,31 @@ export const createTransform = authorizationProject(TranformCreateSchema, async 
                     await transformSociety.saveData()
 
                     break
+                case "Individu":
+                    let loadPerson = await loader.getPerson(id)
+                    let transcoPerson = await loader.getTranscoPerson(id, projectId)
+                    const transformPerson = new Transform(
+                        {
+                            iteratorLabel: "Individu",
+                            person: {
+                                data: loadPerson,
+                                transco: {
+                                    numSS: transcoPerson.numSS,
+                                    newId: transcoPerson.newId ?? ""
+                                }
+                            }
+                        },
+                        columns,
+                        extractionDetail.label,
+                        projectId,
+                        projectDetail.softwareLabel,
+                        userId,
+                        projectFileDetail.fileLabel
+
+                    )
+                    //await transformPerson.deleteData()
+                    await transformPerson.saveData()
+                    break
                 default:
                     throw new ActionError("Le type de fichier n'est pas supporté")
 

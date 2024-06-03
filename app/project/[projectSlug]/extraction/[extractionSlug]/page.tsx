@@ -14,8 +14,6 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import Link from "next/link";
-import { it } from "node:test";
-import { Transco } from "@/src/class/transco";
 export default async function Page({ params }: { params: { projectSlug: string, extractionSlug: string } }) {
     const session = await auth()
     if (!session?.user?.id) {
@@ -36,20 +34,28 @@ export default async function Page({ params }: { params: { projectSlug: string, 
     if (!extractionDetail) {
         notFound()
     }
-    const { transcoSociety } = await project.getTransco()
+    const { transcoSociety, transcoPerson } = await project.getTransco()
     const filesList = await extraction.getFiles()
     const files = filesList.files.map((file) => {
         return {
             projectSlug: params.projectSlug,
             extractionSlug: params.extractionSlug,
+            projectId: projectDetail.id,
+            extractionLabel: extractionDetail.label,
             fileLabel: file.fileLabel,
             status: file.status,
             iteratorLabel: file.iteratorLabel,
             projectFileSlug: file.projectFileSlug,
             countValue: filesList.countFiles.count,
-            idList: file.iteratorLabel === 'Société' ? transcoSociety.map((society) => { return society.siren }) : []
+            extractionFileSlug: file.slug,
+            idList: file.iteratorLabel === 'Société' ?
+                transcoSociety.map((society) => { return society.siren }) :
+                file.iteratorLabel === 'Individu' ?
+                    transcoPerson.map((person) => { return person.numSS }) : []
         }
     })
+
+
     return (
         <Container>
             <ContainerBreadCrumb>
@@ -77,7 +83,7 @@ export default async function Page({ params }: { params: { projectSlug: string, 
                 </Breadcrumb>
             </ContainerBreadCrumb>
             <ContainerDataTable>
-                <DataTable columns={columns} data={files} inputSearch="siren" inputSearchPlaceholder="Chercher par siren" />
+                <DataTable columns={columns} data={files} inputSearch="fileLabel" inputSearchPlaceholder="Chercher par fichier" />
             </ContainerDataTable>
 
         </Container>

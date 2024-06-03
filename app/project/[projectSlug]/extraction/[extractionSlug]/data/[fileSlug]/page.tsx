@@ -1,7 +1,10 @@
+import CardExtractionFile from "@/components/card/CardExtractionFile";
 import { auth } from "@/lib/auth";
 import { Project } from "@/src/class/project";
 import { notFound } from "next/navigation";
-import { Container, ContainerBreadCrumb, ContainerForm } from "@/components/container/Container";
+import { Container, ContainerBreadCrumb, ContainerDataTable, ContainerForm } from "@/components/container/Container";
+import { Extraction } from "@/src/class/extraction";
+import { Data } from "@/src/class/data";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -11,11 +14,8 @@ import {
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import Link from "next/link";
-import { ProjectFile } from "@/src/class/projectFile";
-import { ProjectColumn } from "@/src/class/projectColumn";
-import EditProjectColumn from "@/components/form/EditProjectColumn";
-import { Format } from "@/src/class/format";
-export default async function Page({ params }: { params: { projectSlug: string, fileSlug: string, columnSlug: string } }) {
+export default async function Page({ params }: { params: { projectSlug: string, extractionSlug: string, fileSlug: string } }) {
+    console.log('params', params)
     const session = await auth()
     if (!session?.user?.id) {
         throw new Error('Vous n\'êtes pas connecté')
@@ -30,16 +30,24 @@ export default async function Page({ params }: { params: { projectSlug: string, 
     if (!authorization) {
         throw new Error('Vous n\'avez pas accès à ce projet')
     }
-    const file = new ProjectFile(params.fileSlug)
-    const fileDetail = await file.getFileDetail()
-    if (!fileDetail) {
+    const extraction = new Extraction(params.extractionSlug)
+    const extractionDetail = await extraction.getExtraction()
+    if (!extractionDetail) {
         notFound()
     }
-    const column = new ProjectColumn(params.columnSlug)
-    const columnDetail = await column.getColumnDetail()
-    const standardFields = await file.getStandardFields()
-    const format = new Format()
-    const formatList = await format.getFormat()
+
+    const file = await extraction.getFile(params.fileSlug)
+    if (!file) {
+        notFound()
+    }
+    const data = await new Data(
+        projectDetail.id,
+        file.fileLabel,
+        extractionDetail.label
+    ).getDatas()
+
+
+
     return (
         <Container>
             <ContainerBreadCrumb>
@@ -59,24 +67,20 @@ export default async function Page({ params }: { params: { projectSlug: string, 
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
                             <BreadcrumbLink asChild>
-                                <Link href={`/project/${params.projectSlug}/param/${params.fileSlug}/edit`}>{fileDetail.fileLabel}</Link>
+                                <Link href={`/project/${params.projectSlug}/extraction/${params.extractionSlug}`}>{extractionDetail.label}</Link>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                     </BreadcrumbList>
                 </Breadcrumb>
             </ContainerBreadCrumb>
-            <ContainerForm title="Edition mapping champ">
-                <EditProjectColumn
-                    projectSlug={params.projectSlug}
-                    fileSlug={params.fileSlug}
-                    columnSlug={params.columnSlug}
-                    column={columnDetail}
-                    standardFields={standardFields}
-                    formatList={formatList}
-
+            <ContainerDataTable>
+                <CardExtractionFile
+                    fileLabel={file.fileLabel}
+                    data={data}
                 />
-            </ContainerForm>
+            </ContainerDataTable>
+
         </Container>
     )
 

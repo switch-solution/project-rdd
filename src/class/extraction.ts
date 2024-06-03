@@ -17,6 +17,20 @@ export class Extraction {
         }
     }
 
+    getFile = async (fileSlug: string) => {
+        try {
+            const file = await prisma.extraction_File.findUniqueOrThrow({
+                where: {
+                    slug: fileSlug
+                }
+            })
+            return file
+        } catch (err: unknown) {
+            console.error(err)
+            throw new Error(err as string)
+        }
+    }
+
     getFiles = async () => {
         try {
             const extraction = await this.getExtraction()

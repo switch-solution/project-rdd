@@ -169,6 +169,7 @@ model Standard_Field {
     minLength               Int?
     maxLength               Int?
     format                  String?
+    Format                  Format?                   @relation(fields: [type, format], references: [type, format])
     createdAt               DateTime                  @default(now())
     updatedAt               DateTime                  @updatedAt
     createdBy               String                    @default("system")
@@ -229,6 +230,7 @@ model Column {
     updatedAt          DateTime         @updatedAt
     createdBy          String           @default("system")
     type               String
+    Format             Format?          @relation(fields: [type, format], references: [type, format])
     standardFieldLabel String?
     Standard_Field     Standard_Field?  @relation(fields: [standardFieldLabel], references: [label])
     order              Int
@@ -254,6 +256,8 @@ model Project_Column {
     softwareLabel      String
     columnLabel        String
     type               String
+    Format             Format?         @relation(fields: [type, format], references: [type, format])
+    format             String?
     standardFieldLabel String?
     Standard_Field     Standard_Field? @relation(fields: [standardFieldLabel], references: [label])
     min                Int?
@@ -433,7 +437,7 @@ model Person {
     surname       String
     firstname     String
     sex           String
-    birthday      DateTime
+    birthday      String
     placeOfBith   String
     address1      String
     codeZip       String
@@ -698,4 +702,17 @@ model Dsn_Value_Exist {
     createdBy  String   @default("system")
 
     @@id([dsnId, projectId, value])
+}
+
+model Format {
+    type           String
+    format         String
+    createdAt      DateTime         @default(now())
+    updatedAt      DateTime         @updatedAt
+    createdBy      String           @default("system")
+    Standard_Field Standard_Field[]
+    Column         Column[]
+    Project_Column Project_Column[]
+
+    @@id([type, format])
 }

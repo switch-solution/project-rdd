@@ -17,6 +17,7 @@ export const createExtraction = authorizationProject(ExtractionCreateSchema, asy
                 projectId
             }
         })
+        console.log(`Extraction-${countExtraction + 1}`)
 
         const extraction = await prisma.extraction.create({
             data: {
@@ -25,7 +26,7 @@ export const createExtraction = authorizationProject(ExtractionCreateSchema, asy
                 createdBy: userId,
                 description,
                 status: 'En attente',
-                slug: `Extraction-${countExtraction + 1}`
+                slug: `Extraction-${projectSlug}-${countExtraction + 1}`
             }
         })
         extractionSlug = extraction.slug

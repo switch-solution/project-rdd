@@ -2,10 +2,20 @@ import NextAuth from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "@/lib/prisma"
 import GitHub from "next-auth/providers/github"
+import Nodemailer from "next-auth/providers/nodemailer"
 import { Logger } from "@/src/class/logger"
+import { env } from "./env"
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: PrismaAdapter(prisma),
-    providers: [GitHub],
+    providers: [
+        GitHub,
+        Nodemailer({
+            server: env.EMAIL_SERVER,
+            from: env.EMAIL_FROM,
+        }),
+    ],
+    debug: env.NODE_ENV === "development" ? true : false,
     callbacks: {
         //https://next-auth.js.org/configuration/callbacks
         async redirect({ url, baseUrl }) {
@@ -27,11 +37,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             })
         },
     },
-    theme: {
-        colorScheme: "auto", // "auto" | "dark" | "light"
-        brandColor: "", // Hex color code
-        logo: "", // Absolute URL to image
-        buttonText: "" // Hex color code
-    }
+
 
 })
