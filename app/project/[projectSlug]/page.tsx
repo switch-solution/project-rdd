@@ -12,6 +12,7 @@ import { auth } from "@/lib/auth";
 import { Project } from "@/src/class/project";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { count } from "console";
 export default async function Page({ params }: { params: { projectSlug: string } }) {
     const session = await auth()
     if (!session?.user?.id) {
@@ -27,7 +28,20 @@ export default async function Page({ params }: { params: { projectSlug: string }
     if (!authorization) {
         throw new Error('Vous n\'avez pas accès à ce projet')
     }
-    const { countDsn, countNumSS, countEstablishment, countSociety, countTranscoJob, countTranscoPerson, countTranscoWorkContract, countExtraction } = await project.count()
+    const {
+        countDsn,
+        countNumSS,
+        countEstablishment,
+        countSociety,
+        countTranscoJob,
+        countTranscoPerson,
+        countTranscoWorkContract,
+        countExtraction,
+        countPersonBank,
+        countWorkContract,
+        countTranscoSociety
+
+    } = await project.count()
     const projectFile = await project.getFiles()
     const extractions = await project.getExtraction()
     return (
@@ -60,7 +74,10 @@ export default async function Page({ params }: { params: { projectSlug: string }
                     countTranscoPerson,
                     countTranscoWorkContract,
                     countTranscoJob,
-                    countExtraction
+                    countExtraction,
+                    countPersonBank,
+                    countWorkContract,
+                    countTranscoSociety
                 }}
                 files={projectFile}
                 extrations={extractions}

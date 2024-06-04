@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import {
     Home,
     LineChart,
-    Settings,
+    File,
     Building2,
     Users2,
     PanelLeft,
@@ -20,7 +20,8 @@ import {
     Pencil,
     Workflow,
     Check,
-    User
+    User,
+    Package
 } from "lucide-react"
 import { auth } from "@/lib/auth";
 import { redirect } from 'next/navigation';
@@ -48,16 +49,31 @@ export default async function NavBar() {
                                 </Link>
                             </TooltipTrigger>
                             <TooltipContent side="right">Accueil</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Link
+                                    href="/template"
+                                    className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:size-8"
+                                >
+                                    <Package className="size-5" />
+                                    <span className="sr-only">Template</span>
+                                </Link>
+                            </TooltipTrigger>
+                            <TooltipContent side="right">Template</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
                             <TooltipTrigger asChild>
                                 <Link
                                     href="/file"
                                     className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:size-8"
                                 >
-                                    <Pencil className="size-5" />
-                                    <span className="sr-only">Paramétrage</span>
+                                    <File className="size-5" />
+                                    <span className="sr-only">Fichier</span>
                                 </Link>
                             </TooltipTrigger>
-                            <TooltipContent side="right">Paramétrage</TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
                             <TooltipTrigger asChild>
                                 <Link
                                     href="/user"

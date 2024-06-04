@@ -46,7 +46,7 @@ export const columns: ColumnDef<File>[] = [
         cell: ({ row }) => {
             const file = row.original
             return (
-                <Link href={`/file/${file.slug}/columns`}><ArrowRight /></Link>
+                <Link href={`/file/${file.slug}/columns/`}><ArrowRight /></Link>
             )
         },
     },

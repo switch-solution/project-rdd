@@ -32,9 +32,6 @@ type ExtractionDsn = {
 }
 
 
-
-
-
 export default function UploadFileDsn({ projectSlug }: { projectSlug: string }) {
     const router = useRouter()
     const addDSnData: Dsn[] = []
@@ -157,8 +154,9 @@ export default function UploadFileDsn({ projectSlug }: { projectSlug: string }) 
         <form onSubmit={handleSubmit}>
             <Label htmlFor="dsn">DSN</Label>
             <Input id="dsn" name="dsn" type="file" accept=".dsn" required multiple />
-            <Button type="submit">Envoyer</Button>
-            <Progress value={progress} />
+            {!loading && <Button type="submit">Envoyer</Button>}
+            {loading && <Progress value={progress} />}
+
         </form>
     )
 }

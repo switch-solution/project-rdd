@@ -1,30 +1,13 @@
 "use client";
-import { useState } from "react";
-import Image from "next/image"
 import Link from "next/link"
 import {
     ArrowRight,
-    ChevronLeft,
-    ChevronRight,
-    Copy,
-    CreditCard,
+    Upload,
     File,
-    Home,
-    LineChart,
     ListFilter,
-    MoreVertical,
-    Package,
-    Package2,
-    PanelLeft,
-    Search,
-    Settings,
-    ShoppingCart,
-    Truck,
-    Users2,
+
 } from "lucide-react"
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge"
-import { Import } from "lucide-react";
 import { Button } from "@/components/ui/button"
 import {
     Card,
@@ -70,7 +53,10 @@ export function Dashboard({ projectSlug, count, files, extrations }: {
         countTranscoPerson: number,
         countTranscoWorkContract: number,
         countTranscoJob: number,
-        countExtraction: number
+        countExtraction: number,
+        countPersonBank: number,
+        countWorkContract: number,
+        countTranscoSociety: number,
 
     },
     files: {
@@ -217,7 +203,7 @@ export function Dashboard({ projectSlug, count, files, extrations }: {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="sm:table-cell">
-                                                <Link href={`/project/${projectSlug}/upload/dsn`}> <Import /></Link>
+                                                <Link href={`/project/${projectSlug}/upload/dsn`}> <Upload /></Link>
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
@@ -233,7 +219,7 @@ export function Dashboard({ projectSlug, count, files, extrations }: {
                                                 </Badge>
                                             </TableCell>
                                             <TableCell className="sm:table-cell">
-                                                <Link href={`/project/${projectSlug}/upload/bank`}><Import /></Link>
+                                                <Link href={`/project/${projectSlug}/upload/bank`}><Upload /></Link>
                                             </TableCell>
                                         </TableRow>
                                     </TableBody>
@@ -505,20 +491,10 @@ export function Dashboard({ projectSlug, count, files, extrations }: {
                                 </span>
                                 <span>{count.countDsn}</span>
                             </li>
-                            <li className="flex items-center justify-between">
-                                <span className="text-muted-foreground">
-                                    Fichier banque
-                                </span>
-                                <span>0</span>
-                            </li>
-                            <li className="flex items-center justify-between">
-                                <span className="text-muted-foreground">
-                                    Fichier classification
-                                </span>
-                                <span>0</span>
-                            </li>
                         </ul>
                         <Separator className="my-2" />
+                        <div className="font-semibold">Volume.</div>
+
                         <ul className="grid gap-3">
                             <li className="flex items-center justify-between">
                                 <span className="text-muted-foreground">Nombre unique de numéro de SIREN</span>
@@ -532,7 +508,32 @@ export function Dashboard({ projectSlug, count, files, extrations }: {
                                 <span className="text-muted-foreground">Nombre unique de numéro de Sécurité Sociale</span>
                                 <span>{count.countNumSS}</span>
                             </li>
+                            <li className="flex items-center justify-between">
+                                <span className="text-muted-foreground">Nombre unique de numéro de contrat de travail</span>
+                                <span>{count.countWorkContract}</span>
+                            </li>
+                            <li className="flex items-center justify-between">
+                                <span className="text-muted-foreground">Nombre de RIB salariés</span>
+                                <span>{count.countPersonBank}</span>
+                            </li>
                         </ul>
+                        <Separator className="my-2" />
+                        <div className="font-semibold">Transcodification.</div>
+                        <ul className="grid gap-3">
+                            <li className="flex items-center justify-between">
+                                <span className="text-muted-foreground">Transco sociétés</span>
+                                <span>{count.countTranscoSociety}</span>
+                            </li>
+                            <li className="flex items-center justify-between">
+                                <span className="text-muted-foreground">Transco matricule</span>
+                                <span>{count.countTranscoPerson}</span>
+                            </li>
+                            <li className="flex items-center justify-between">
+                                <span className="text-muted-foreground">Transco contrat de de travail</span>
+                                <span>{count.countTranscoWorkContract}</span>
+                            </li>
+                        </ul>
+
                         <Separator className="my-2" />
                         <ul className="grid gap-3">
                             <li className="flex items-center justify-between">

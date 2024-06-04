@@ -8,7 +8,7 @@ import { Logger } from '@/src/class/logger';
 import { ProjectColumn } from '@/src/class/projectColumn';
 
 export const editProjectColumn = authorizationProject(ProjectColumnEditSchema, async (values: z.infer<typeof ProjectColumnEditSchema>, { userId, projectId }) => {
-    const { projectSlug, fileSlug, columnSlug, label, type, standardFieldLabel, defaultValue, isRequired, order, min, max, minLength, maxLength, format } = ProjectColumnEditSchema.parse(values);
+    const { projectSlug, fileSlug, columnSlug, label, type, standardFieldLabel, defaultValue, isRequired, order, min, max, minLength, maxLength, format, typeValue } = ProjectColumnEditSchema.parse(values);
     try {
         const projectColumn = new ProjectColumn(columnSlug)
         const columnDetail = await projectColumn.getColumnDetail()
@@ -33,7 +33,8 @@ export const editProjectColumn = authorizationProject(ProjectColumnEditSchema, a
             max,
             minLength,
             maxLength,
-            format
+            format,
+            typeValue
         })
 
         const logger = new Logger()

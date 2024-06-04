@@ -1,5 +1,4 @@
 import { auth } from "@/lib/auth";
-import { Project } from "@/src/class/project";
 import { notFound } from "next/navigation";
 import { Container, ContainerBreadCrumb, ContainerForm } from "@/components/container/Container";
 import {
@@ -10,24 +9,26 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { prisma } from "@/lib/prisma"
 import Link from "next/link";
-import UploadFileDsn from "@/components/form/UploadDsn";
-import UploadFileTemplate from "@/components/form/UploadTemplate";
-export default async function Page({ params }: { params: { projectSlug: string, type: string } }) {
+import ViewColumn from "@/components/form/ViewColumn";
+import { Format } from "@/src/class/format";
+import { File } from "@/src/class/file";
+export default async function Page({ params }: { params: { projectSlug: string, fileSlug: string, columnSlug: string } }) {
     const session = await auth()
     if (!session?.user?.id) {
         throw new Error('Vous n\'êtes pas connecté')
     }
     const userId = session.user.id
-    const project = new Project(params.projectSlug)
-    const projectDetail = await project.project()
-    if (!projectDetail) {
+    const file = new File(params.fileSlug)
+    const fileDetail = await file.getDetail()
+    if (!fileDetail) {
         notFound()
     }
-    const authorization = await project.userExist(userId)
-    if (!authorization) {
-        throw new Error('Vous n\'avez pas accès à ce projet')
-    }
+    const column = await file.getColumnDetail(params.columnSlug)
+    const standardFields = await prisma.standard_Field.findMany()
+    const format = new Format()
+    const formatList = await format.getFormat()
     return (
         <Container>
             <ContainerBreadCrumb>
@@ -41,25 +42,35 @@ export default async function Page({ params }: { params: { projectSlug: string, 
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
                             <BreadcrumbLink asChild>
-                                <Link href={`/project/${params.projectSlug}`}>{projectDetail.label}</Link>
+                                <Link href={`/file`}>Fichier</Link>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
                             <BreadcrumbLink asChild>
-                                <Link href={`/project/${params.projectSlug}/upload/${params.type}`}>{params.type}</Link>
+                                <Link href={`/file/${params.fileSlug}/columns`}>{fileDetail.label}</Link>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbLink asChild>
+                                <Link href={`/file/${params.fileSlug}/columns/${params.columnSlug}/edit`}>{column.label}</Link>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                     </BreadcrumbList>
                 </Breadcrumb>
             </ContainerBreadCrumb>
-            <ContainerForm title={
-                params.type === 'bank' ? 'Importer un fichier bancaire' : 'Importer un fichier DSN'
-            }>
-                {params.type === 'bank' &&
-                    <UploadFileTemplate projectSlug={params.projectSlug} templateSlug="rib_salaries" />}
-                {params.type === 'dsn' && <UploadFileDsn projectSlug={params.projectSlug} />}
+            <ContainerForm title="Edition mapping champ">
+                <ViewColumn
+                    projectSlug={params.projectSlug}
+                    fileSlug={params.fileSlug}
+                    columnSlug={params.columnSlug}
+                    column={column}
+                    standardFields={standardFields}
+                    formatList={formatList}
+
+                />
             </ContainerForm>
         </Container>
     )

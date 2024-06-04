@@ -23,8 +23,10 @@ export default function CardExtractionFile({
         <Card className="w-[350px]">
             <CardHeader>
                 <CardTitle>{fileLabel}</CardTitle>
+                <CardDescription>Nombre de lignes : {data.length}</CardDescription>
             </CardHeader>
             <CardContent>
+
                 <ButtonExportXlsx
                     fileLabel={fileLabel}
                     data={data} />

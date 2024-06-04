@@ -13,6 +13,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import type { IdListPerson, IdListSociety, IdListWorkContract } from "@/src/helpers/type";
 import Link from "next/link";
 export default async function Page({ params }: { params: { projectSlug: string, extractionSlug: string } }) {
     const session = await auth()
@@ -34,9 +35,22 @@ export default async function Page({ params }: { params: { projectSlug: string, 
     if (!extractionDetail) {
         notFound()
     }
-    const { transcoSociety, transcoPerson } = await project.getTransco()
+    const { transcoSociety, transcoPerson, transcoWorkContract } = await project.getTransco()
     const filesList = await extraction.getFiles()
+
     const files = filesList.files.map((file) => {
+        let idList: unknown
+        switch (file.iteratorLabel) {
+            case 'Société':
+                idList = transcoSociety
+                break
+            case 'Individu':
+                idList = transcoPerson
+                break
+            case 'Contrat de travail':
+                idList = transcoWorkContract
+                break
+        }
         return {
             projectSlug: params.projectSlug,
             extractionSlug: params.extractionSlug,
@@ -46,12 +60,9 @@ export default async function Page({ params }: { params: { projectSlug: string, 
             status: file.status,
             iteratorLabel: file.iteratorLabel,
             projectFileSlug: file.projectFileSlug,
-            countValue: filesList.countFiles.count,
             extractionFileSlug: file.slug,
-            idList: file.iteratorLabel === 'Société' ?
-                transcoSociety.map((society) => { return society.siren }) :
-                file.iteratorLabel === 'Individu' ?
-                    transcoPerson.map((person) => { return person.numSS }) : []
+            countRows: filesList.countFiles.countRows.find((count) => count.fileLabel === file.fileLabel)?.count || 0,
+            idList: idList as IdListPerson[] | IdListSociety[] | IdListWorkContract[]
         }
     })
 

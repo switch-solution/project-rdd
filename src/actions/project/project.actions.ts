@@ -76,6 +76,7 @@ export const createProject = action(ProjectCreateSchema, async (values: z.infer<
                         createdBy: userId,
                         softwareLabel: softwareLabel,
                         fileLabel: file.label,
+                        typeValue: column.typeValue,
                         label: column.label,
                         type: column.type,
                         format: column.format,

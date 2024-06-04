@@ -59,7 +59,13 @@ export default async function Page({ params }: { params: { projectSlug: string, 
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
                             <BreadcrumbLink asChild>
-                                <Link href={`/project/${params.projectSlug}/param/${params.fileSlug}/edit`}>{fileDetail.fileLabel}</Link>
+                                <Link href={`/project/${params.projectSlug}/param/${params.fileSlug}/`}>{fileDetail.fileLabel}</Link>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbLink asChild>
+                                <Link href={`/project/${params.projectSlug}/param/${params.fileSlug}/column/${params.columnSlug}/edit`}>{columnDetail.label}</Link>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />

@@ -48,6 +48,7 @@ class IteratorV0001 extends Seed {
                 await prisma.standard_Field.createMany({
                     data: [
                         {
+                            typeValue: 'Champ standard',
                             table: 'Society',
                             field: 'siren',
                             label: 'Société SIREN',
@@ -56,6 +57,7 @@ class IteratorV0001 extends Seed {
                             maxLength: 9,
                         },
                         {
+                            typeValue: 'Champ standard',
                             table: 'Society',
                             field: 'apen',
                             label: 'Société APEN',
@@ -64,6 +66,7 @@ class IteratorV0001 extends Seed {
                             maxLength: 5,
                         },
                         {
+                            typeValue: 'Champ standard',
                             table: 'Society',
                             field: 'zipCode',
                             label: 'Société Code postal',
@@ -72,9 +75,19 @@ class IteratorV0001 extends Seed {
                             maxLength: 5,
                         },
                         {
+                            typeValue: 'Champ standard',
                             table: 'Society',
                             field: 'city',
                             label: 'Société ville',
+                            type: 'string',
+                            minLength: 1,
+                            maxLength: 50,
+                        },
+                        {
+                            typeValue: 'Champ standard',
+                            table: 'Transco_Society',
+                            field: 'newId',
+                            label: 'Société transcodification code',
                             type: 'string',
                             minLength: 1,
                             maxLength: 50,
@@ -85,19 +98,28 @@ class IteratorV0001 extends Seed {
                     data: [
                         {
                             iteratorLabel: 'Société',
+                            typeValue: 'Champ standard',
                             fieldLabel: 'Société SIREN',
                         },
                         {
                             iteratorLabel: 'Société',
+                            typeValue: 'Champ standard',
                             fieldLabel: 'Société APEN',
                         },
                         {
                             iteratorLabel: 'Société',
+                            typeValue: 'Champ standard',
                             fieldLabel: 'Société Code postal',
                         },
                         {
                             iteratorLabel: 'Société',
+                            typeValue: 'Champ standard',
                             fieldLabel: 'Société ville',
+                        },
+                        {
+                            iteratorLabel: 'Société',
+                            typeValue: 'Champ standard',
+                            fieldLabel: 'Société transcodification code',
                         },
                     ]
                 })

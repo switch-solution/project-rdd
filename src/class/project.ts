@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { Logger } from "@/src/class/logger";
-
+import type { IdListSociety, IdListPerson, IdListWorkContract } from "../helpers/type";
 export class Project extends Logger {
     slug: string;
     constructor(slug: string) {
@@ -83,6 +83,21 @@ export class Project extends Logger {
                     }
                 }
             })
+            const countPersonBank = await prisma.person_Bank.count({
+                where: {
+                    Project: {
+                        slug: this.slug
+                    }
+                }
+            })
+            const countWorkContract = await prisma.workContract.groupBy({
+                by: ['numSS', 'contractId'],
+                where: {
+                    Project: {
+                        slug: this.slug
+                    }
+                }
+            })
             return {
                 countDsn,
                 countNumSS: countNumSS.length,
@@ -93,7 +108,9 @@ export class Project extends Logger {
                 countTranscoPerson,
                 countTranscoWorkContract,
                 countTranscoJob,
-                countExtraction
+                countExtraction,
+                countPersonBank,
+                countWorkContract: countWorkContract.length
             }
         } catch (err) {
             console.error(err)
@@ -108,8 +125,11 @@ export class Project extends Logger {
                     Project: {
                         slug: this.slug
                     }
+                },
+                select: {
+                    siren: true
                 }
-            })
+            }) as unknown as IdListSociety[]
             const transcoEstablishment = await prisma.transco_Establishment.findMany({
                 where: {
                     Project: {
@@ -122,12 +142,27 @@ export class Project extends Logger {
                     Project: {
                         slug: this.slug
                     }
+                },
+                select: {
+                    numSS: true
                 }
-            })
+            }) as unknown as IdListPerson[]
+            const transcoWorkContract = await prisma.transco_WorkContract.findMany({
+                where: {
+                    Project: {
+                        slug: this.slug
+                    }
+                },
+                select: {
+                    numSS: true,
+                    contractId: true
+                }
+            }) as unknown as IdListWorkContract[]
             return {
                 transcoSociety,
                 transcoEstablishment,
-                transcoPerson
+                transcoPerson,
+                transcoWorkContract
             }
         } catch (err) {
             console.error(err)

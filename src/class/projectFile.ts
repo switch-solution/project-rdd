@@ -21,6 +21,7 @@ export class ProjectFile {
         }
     }
 
+
     getStandardFields = async () => {
         try {
             const projectFileDetail = await this.getFileDetail();

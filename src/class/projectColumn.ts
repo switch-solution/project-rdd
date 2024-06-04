@@ -50,7 +50,8 @@ export class ProjectColumn {
         max,
         minLength,
         maxLength,
-        format
+        format,
+        typeValue
     }: {
         label: string,
         type: string,
@@ -62,7 +63,8 @@ export class ProjectColumn {
         max?: number,
         minLength?: number,
         maxLength?: number,
-        format?: string | null
+        format?: string | null,
+        typeValue: string
 
     }) => {
         try {
@@ -82,6 +84,7 @@ export class ProjectColumn {
                     minLength: minLength ? minLength : null,
                     maxLength: maxLength ? maxLength : null,
                     format: format ? format : null,
+                    typeValue,
                 }
             })
         } catch (error) {

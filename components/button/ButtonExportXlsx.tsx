@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { File } from "lucide-react";
 import XLSX from "xlsx";
 
 export function ButtonExportXlsx({ data, fileLabel }: { data: { [key: string]: string }[], fileLabel: string }) {
@@ -19,8 +18,7 @@ export function ButtonExportXlsx({ data, fileLabel }: { data: { [key: string]: s
                 className="h-7 gap-1 text-sm"
                 onClick={handleClick}
             >
-                <File className="size-3.5" />
-                <span className="sr-only sm:not-sr-only sm:hidden">Exporter au format Excel</span>
+                Exporter au format Excel
             </Button>
         </div>
 

@@ -88,6 +88,7 @@ class FileV0001 extends Seed {
                                 },
                                 {
                                     label: 'Siren',
+                                    typeValue: 'Champ standard',
                                     slug: 'hru-employeur-siren',
                                     description: "Siren employeur.",
                                     type: "string",
@@ -161,6 +162,7 @@ class FileV0001 extends Seed {
                                 },
                                 {
                                     label: 'Code postal',
+                                    typeValue: 'Champ standard',
                                     slug: 'hru-employeur-code-postal',
                                     description: "Code postal de la société.",
                                     type: "string",
@@ -290,6 +292,7 @@ class FileV0001 extends Seed {
                                 },
                                 {
                                     label: 'Code APEN',
+                                    typeValue: 'Champ standard',
                                     slug: 'hru-employeur-code-apen',
                                     description: "Code APEN",
                                     standardFieldLabel: 'Société APEN',

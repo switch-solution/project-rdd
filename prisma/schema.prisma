@@ -121,6 +121,8 @@ model Project {
     Extraction_Data       Extraction_Data[]
     Dsn_Value_Exist       Dsn_Value_Exist[]
     Extraction_File       Extraction_File[]
+    Extraction_Stat       Extraction_Stat[]
+    Person_Bank           Person_Bank[]
 }
 
 model Software {
@@ -149,6 +151,7 @@ model Iterator {
 
 model Iterator_Standard_Field {
     iteratorLabel String
+    typeValue     String
     Iterator      Iterator       @relation(fields: [iteratorLabel], references: [label])
     fieldLabel    String
     Field         Standard_Field @relation(fields: [fieldLabel], references: [label])
@@ -160,6 +163,7 @@ model Iterator_Standard_Field {
 }
 
 model Standard_Field {
+    typeValue               String
     table                   String
     field                   String
     type                    String
@@ -234,6 +238,7 @@ model Column {
     standardFieldLabel String?
     Standard_Field     Standard_Field?  @relation(fields: [standardFieldLabel], references: [label])
     order              Int
+    typeValue          String           @default("defaultValue")
     min                Int?
     max                Int?
     minLength          Int?
@@ -255,6 +260,7 @@ model Project_Column {
     label              String
     softwareLabel      String
     columnLabel        String
+    typeValue          String          @default("defaultValue")
     type               String
     Format             Format?         @relation(fields: [type, format], references: [type, format])
     format             String?
@@ -461,6 +467,27 @@ model Person {
     @@id([dsnId, numSS])
 }
 
+model Person_Bank {
+    projectId String
+    Project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    numSS     String
+    siren     String
+    iban1     String?
+    bic1      String?
+    bank1     String?
+    iban2     String?
+    bic2      String?
+    bank2     String?
+    payrool   Boolean
+    advance   Boolean
+    expense   Boolean
+    updatedAt DateTime @updatedAt
+    createdAt DateTime @default(now())
+    createdBy String
+
+    @@id([projectId, numSS, siren])
+}
+
 model Transco_Person {
     projectId String
     Project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
@@ -645,8 +672,24 @@ model Extraction {
     createdBy       String
     slug            String            @unique
     Extraction_File Extraction_File[]
+    Extraction_Stat Extraction_Stat[]
 
     @@id([label, projectId])
+}
+
+model Extraction_Stat {
+    id              String     @id @default(cuid())
+    startDate       DateTime
+    endDate         DateTime
+    totalRows       Int
+    duration        Int
+    extractionLabel String
+    projectId       String
+    Extraction      Extraction @relation(fields: [extractionLabel, projectId], references: [label, projectId], onDelete: Cascade)
+    Project         Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    createdAt       DateTime   @default(now())
+    updatedAt       DateTime   @updatedAt
+    createdBy       String
 }
 
 model Extraction_File {
@@ -705,14 +748,46 @@ model Dsn_Value_Exist {
 }
 
 model Format {
-    type           String
-    format         String
-    createdAt      DateTime         @default(now())
-    updatedAt      DateTime         @updatedAt
-    createdBy      String           @default("system")
-    Standard_Field Standard_Field[]
-    Column         Column[]
-    Project_Column Project_Column[]
+    type            String
+    format          String
+    createdAt       DateTime          @default(now())
+    updatedAt       DateTime          @updatedAt
+    createdBy       String            @default("system")
+    Standard_Field  Standard_Field[]
+    Column          Column[]
+    Project_Column  Project_Column[]
+    Template_Column Template_Column[]
 
     @@id([type, format])
+}
+
+model Template {
+    label           String            @id
+    table           String
+    slug            String            @unique
+    description     String?
+    createdAt       DateTime          @default(now())
+    updatedAt       DateTime          @updatedAt
+    createdBy       String            @default("system")
+    Template_Column Template_Column[]
+}
+
+model Template_Column {
+    templateLabel String
+    Template      Template @relation(fields: [templateLabel], references: [label])
+    label         String
+    fieldLabel    String
+    description   String
+    order         Int
+    slug          String   @unique
+    minLength     Int
+    maxLength     Int
+    type          String?
+    format        String?
+    Format        Format?  @relation(fields: [type, format], references: [type, format])
+    updatedAt     DateTime @updatedAt
+    createdAt     DateTime @default(now())
+    createdBy     String   @default("system")
+
+    @@unique([templateLabel, order])
 }

@@ -29,4 +29,5 @@ export class Logger {
             throw new Error('Erreur lors de l\'écriture du log')
         }
     }
+
 }

@@ -34,7 +34,6 @@ export default async function Page({ params }: { params: { fileSlug: string } })
             type: column.type,
         }
     })
-    console.log(columnsList)
     return (
         <Container>
             <ContainerBreadCrumb>

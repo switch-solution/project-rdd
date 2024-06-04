@@ -36,6 +36,21 @@ export class File {
         }
 
     }
+    getColumnDetail = async (columnSlug: string) => {
+        try {
+            const column = await prisma.column.findUniqueOrThrow({
+                where: {
+                    slug: columnSlug
+                }
+
+            })
+            return column;
+        } catch (error) {
+            console.log(error);
+            throw new Error("Erreur lors de la récupération des détails de la colonne");
+        }
+
+    }
 
 
 

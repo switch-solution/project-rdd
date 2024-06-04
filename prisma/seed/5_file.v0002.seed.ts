@@ -53,7 +53,8 @@ class FileV0002 extends Seed {
                                 {
                                     label: 'MATRI',
                                     slug: 'hru-individu-matri',
-                                    description: "Matricule du salarié.",
+                                    typeValue: 'Champ standard',
+                                    standardFieldLabel: 'Individu transcodification matricule', description: "Matricule du salarié.",
                                     type: "string",
                                     order: 1,
                                     minLength: 1,
@@ -83,6 +84,8 @@ class FileV0002 extends Seed {
                                 {
                                     label: 'DVIND',
                                     slug: 'hru-individu-dvind',
+                                    typeValue: 'Champ standard',
+                                    standardFieldLabel: 'Individu date de naissance',
                                     description: "Date de validité.",
                                     type: "date",
                                     order: 2,
@@ -139,6 +142,7 @@ class FileV0002 extends Seed {
                                 {
                                     label: 'NMFAM',
                                     slug: 'hru-individu-nmfam',
+                                    typeValue: 'Champ standard',
                                     description: "NOM.FAMILLE",
                                     standardFieldLabel: 'Individu nom',
                                     type: "string",
@@ -170,6 +174,7 @@ class FileV0002 extends Seed {
                                 {
                                     label: 'NMUSA',
                                     slug: 'hru-individu-nmusa',
+                                    typeValue: 'Champ standard',
                                     description: "NOM.USAGE",
                                     standardFieldLabel: 'Individu nom d\'usage',
                                     type: "string",
@@ -200,6 +205,7 @@ class FileV0002 extends Seed {
                                 {
                                     label: 'LPNOM',
                                     slug: 'hru-individu-lpnom',
+                                    typeValue: 'Champ standard',
                                     description: "PRENOM.SALAR",
                                     standardFieldLabel: 'Individu prénom',
                                     type: "string",
@@ -231,6 +237,7 @@ class FileV0002 extends Seed {
                                 {
                                     label: 'CPNOM',
                                     slug: 'hru-individu-cpnom',
+                                    typeValue: 'Champ standard',
                                     description: "PRENOM.CPL.SAL",
                                     standardFieldLabel: 'Individu prénom',
                                     type: "string",
@@ -261,6 +268,7 @@ class FileV0002 extends Seed {
                                 {
                                     label: 'CISEX',
                                     slug: 'hru-individu-cisex',
+                                    typeValue: 'Champ standard',
                                     description: "C.SEXE",
                                     standardFieldLabel: 'Individu sexe',
                                     type: "string",
@@ -291,6 +299,7 @@ class FileV0002 extends Seed {
                                 {
                                     label: 'DNAIS',
                                     slug: 'hru-individu-dnais',
+                                    typeValue: 'Champ standard',
                                     description: "Date de naissance",
                                     standardFieldLabel: 'Individu date de naissance',
                                     type: "date",
@@ -319,8 +328,9 @@ class FileV0002 extends Seed {
                                 {
                                     label: 'LNAIS',
                                     slug: 'hru-individu-lnais',
-                                    description: "LIEU.NAISSANCE",
-                                    standardFieldLabel: 'Individu lieu de naissance',
+                                    typeValue: 'Champ standard',
+                                    description: "Individu lieu de naissance",
+                                    standardFieldLabel: 'Individu département de naissance',
                                     type: "string",
                                     minLength: 1,
                                     maxLength: 30,
@@ -342,7 +352,184 @@ class FileV0002 extends Seed {
                                                 value: 'Obligatoire',
                                                 slug: 'hru-individu-lnais-3',
                                             },
-
+                                        ]
+                                    }
+                                },
+                                {
+                                    label: 'PNAIS',
+                                    slug: 'hru-individu-pnais',
+                                    typeValue: 'Champ standard',
+                                    description: "PAYS.NAISSANCE",
+                                    standardFieldLabel: 'Individu pays de naissance',
+                                    type: "string",
+                                    minLength: 2,
+                                    maxLength: 2,
+                                    order: 11,
+                                    Row: {
+                                        create: [
+                                            {
+                                                order: 1,
+                                                value: 'A(2)',
+                                                slug: 'hru-individu-pnais-1',
+                                            },
+                                            {
+                                                order: 2,
+                                                slug: 'hru-individu-pnais-2',
+                                                value: 'PAYS.NAISSANCE',
+                                            },
+                                            {
+                                                order: 3,
+                                                value: 'Obligatoire',
+                                                slug: 'hru-individu-pnais-3',
+                                            },
+                                        ]
+                                    }
+                                },
+                                {
+                                    label: 'LNATI',
+                                    slug: 'hru-individu-lnati',
+                                    description: "NATIONALITE",
+                                    type: "string",
+                                    minLength: 2,
+                                    maxLength: 2,
+                                    order: 12,
+                                    Row: {
+                                        create: [
+                                            {
+                                                order: 1,
+                                                value: 'A(2)',
+                                                slug: 'hru-individu-lnati-1',
+                                            },
+                                            {
+                                                order: 2,
+                                                slug: 'hru-individu-lnati-2',
+                                                value: 'NATIONALITE',
+                                            },
+                                            {
+                                                order: 3,
+                                                value: 'Obligatoire',
+                                                slug: 'hru-individu-lnati-3',
+                                            },
+                                        ]
+                                    }
+                                },
+                                {
+                                    label: 'NSECU',
+                                    typeValue: 'Méthode',
+                                    standardFieldLabel: 'Individu numéro de sécurité sociale clé',
+                                    slug: 'hru-individu-nsecu',
+                                    description: "Numéro de sécurité sociale.",
+                                    type: "string",
+                                    minLength: 13,
+                                    maxLength: 13,
+                                    order: 13,
+                                    Row: {
+                                        create: [
+                                            {
+                                                order: 1,
+                                                value: 'A(13)',
+                                                slug: 'hru-individu-nsecu-1',
+                                            },
+                                            {
+                                                order: 2,
+                                                slug: 'hru-individu-nsecu-2',
+                                                value: 'NSECU',
+                                            },
+                                            {
+                                                order: 3,
+                                                value: 'Facultatif',
+                                                slug: 'hru-individu-nsecu-3',
+                                            },
+                                        ]
+                                    }
+                                },
+                                {
+                                    label: 'CSECU',
+                                    slug: 'hru-individu-csecu',
+                                    description: "Clef de sécurité sociale.",
+                                    typeValue: 'Méthode',
+                                    standardFieldLabel: 'Individu numéro de sécurité sociale sans clé',
+                                    type: "string",
+                                    minLength: 2,
+                                    maxLength: 2,
+                                    order: 14,
+                                    Row: {
+                                        create: [
+                                            {
+                                                order: 1,
+                                                value: 'A(13)',
+                                                slug: 'hru-individu-csecu-1',
+                                            },
+                                            {
+                                                order: 2,
+                                                slug: 'hru-individu-csecu-2',
+                                                value: 'CLEF.CTL.SS',
+                                            },
+                                            {
+                                                order: 3,
+                                                value: 'Facultatif',
+                                                slug: 'hru-individu-csecu-3',
+                                            },
+                                        ]
+                                    }
+                                },
+                                {
+                                    label: 'CBIC1',
+                                    slug: 'hru-individu-cbic1',
+                                    description: "Code BIC 1",
+                                    typeValue: 'Champ standard',
+                                    standardFieldLabel: 'Individu bic 1',
+                                    type: "string",
+                                    minLength: 11,
+                                    maxLength: 11,
+                                    order: 15,
+                                    Row: {
+                                        create: [
+                                            {
+                                                order: 1,
+                                                value: 'A(11)',
+                                                slug: 'hru-individu-cbic-1',
+                                            },
+                                            {
+                                                order: 2,
+                                                slug: 'hru-individu-cbic-2',
+                                                value: 'CODE.BIC.1',
+                                            },
+                                            {
+                                                order: 3,
+                                                value: 'Facultatif',
+                                                slug: 'hru-individu-cbic-3',
+                                            },
+                                        ]
+                                    }
+                                },
+                                {
+                                    label: 'IBAN1',
+                                    slug: 'hru-individu-iban1',
+                                    description: "Code IBAN 1",
+                                    typeValue: 'Champ standard',
+                                    standardFieldLabel: 'Individu IBAN 1',
+                                    type: "string",
+                                    minLength: 34,
+                                    maxLength: 34,
+                                    order: 16,
+                                    Row: {
+                                        create: [
+                                            {
+                                                order: 1,
+                                                value: 'A(34)',
+                                                slug: 'hru-individu-iban-1',
+                                            },
+                                            {
+                                                order: 2,
+                                                slug: 'hru-individu-iban-2',
+                                                value: 'COMPTE.IBAN.1',
+                                            },
+                                            {
+                                                order: 3,
+                                                value: 'Facultatif',
+                                                slug: 'hru-individu-iban-3',
+                                            },
                                         ]
                                     }
                                 },

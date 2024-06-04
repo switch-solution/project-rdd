@@ -96,19 +96,29 @@ export class Data {
 
     private getLastRowBeforeData = async () => {
         try {
-            const row = await prisma.project_Row.findFirstOrThrow({
+            const coutRow = await prisma.project_Row.count({
                 where: {
                     projectId: this.projectId,
                     fileLabel: this.fileLabel
-                },
-                select: {
-                    order: true
-                },
-                orderBy: {
-                    order: 'desc'
                 }
             })
-            return row.order
+            if (coutRow) {
+                const row = await prisma.project_Row.findFirstOrThrow({
+                    where: {
+                        projectId: this.projectId,
+                        fileLabel: this.fileLabel
+                    },
+                    select: {
+                        order: true
+                    },
+                    orderBy: {
+                        order: 'desc'
+                    }
+                })
+                return row.order
+            }
+            return 0
+
         } catch (err: unknown) {
             console.error(err)
             throw new Error(err as string)
