@@ -326,7 +326,7 @@ CREATE TABLE "Society" (
 CREATE TABLE "Transco_Society" (
     "projectId" TEXT NOT NULL,
     "siren" TEXT NOT NULL,
-    "newId" TEXT,
+    "transcoSocietyNewId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "createdBy" TEXT NOT NULL,
@@ -357,7 +357,7 @@ CREATE TABLE "Transco_Establishment" (
     "projectId" TEXT NOT NULL,
     "siren" TEXT NOT NULL,
     "nic" TEXT NOT NULL,
-    "newId" TEXT,
+    "transcoEstablishmentNewId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "createdBy" TEXT NOT NULL,
@@ -429,7 +429,7 @@ CREATE TABLE "Transco_Person" (
     "lastname" TEXT NOT NULL,
     "firstname" TEXT NOT NULL,
     "oldId" TEXT NOT NULL,
-    "newId" TEXT,
+    "transcoEmployeeNewId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "createdBy" TEXT NOT NULL,
@@ -446,7 +446,7 @@ CREATE TABLE "WorkContract" (
     "projectId" TEXT NOT NULL,
     "siren" TEXT NOT NULL,
     "nic" TEXT NOT NULL,
-    "startDate" TIMESTAMP(3) NOT NULL,
+    "startDate" TEXT NOT NULL,
     "status" TEXT NOT NULL,
     "retirement" TEXT NOT NULL,
     "pcs" TEXT NOT NULL,
@@ -455,7 +455,7 @@ CREATE TABLE "WorkContract" (
     "employmentLabel" TEXT NOT NULL,
     "contract" TEXT NOT NULL,
     "publicDispPolitic" TEXT NOT NULL,
-    "contractEndDate" TIMESTAMP(3) NOT NULL,
+    "contractEndDate" TEXT NOT NULL,
     "DNACodeUnitTime" TEXT NOT NULL,
     "DSNWorkQuotaEstablishment" TEXT NOT NULL,
     "DSNWorkQuotaWorkContract" TEXT NOT NULL,
@@ -473,9 +473,9 @@ CREATE TABLE "WorkContract" (
     "unemployment" TEXT,
     "idPublicEmployer" TEXT,
     "methodUnemployment" TEXT,
-    "joiningDate" TIMESTAMP(3),
-    "denunciationDate" TIMESTAMP(3),
-    "dateManagementAgreement" TIMESTAMP(3),
+    "joiningDate" TEXT,
+    "denunciationDate" TEXT,
+    "dateManagementAgreement" TEXT,
     "idAgreement" TEXT,
     "healthRiskDelegate" TEXT,
     "multipleJobCode" TEXT NOT NULL,
@@ -522,7 +522,7 @@ CREATE TABLE "WorkContract" (
     "grade" TEXT,
     "cti" TEXT,
     "finess" TEXT,
-    "dateStart" TIMESTAMP(3),
+    "dateStart" TEXT,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "createdBy" TEXT NOT NULL,
@@ -541,7 +541,7 @@ CREATE TABLE "Transco_WorkContract" (
     "lastname" TEXT NOT NULL,
     "contractId" TEXT NOT NULL,
     "employeeId" TEXT NOT NULL,
-    "newId" TEXT,
+    "transcoContractNewId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "createdBy" TEXT NOT NULL,
@@ -647,8 +647,8 @@ CREATE TABLE "Extraction_Data" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "createdBy" TEXT NOT NULL,
-    "softwareLabel" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
+    "softwareLabel" TEXT,
 
     CONSTRAINT "Extraction_Data_pkey" PRIMARY KEY ("projectId","extractionLabel","fileLabel","columnLabel","rowOrder")
 );
@@ -753,25 +753,25 @@ CREATE UNIQUE INDEX "Project_Row_slug_key" ON "Project_Row"("slug");
 CREATE UNIQUE INDEX "Transco_Society_slug_key" ON "Transco_Society"("slug");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Transco_Society_projectId_newId_key" ON "Transco_Society"("projectId", "newId");
+CREATE UNIQUE INDEX "Transco_Society_projectId_transcoSocietyNewId_key" ON "Transco_Society"("projectId", "transcoSocietyNewId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Transco_Establishment_slug_key" ON "Transco_Establishment"("slug");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Transco_Establishment_projectId_newId_key" ON "Transco_Establishment"("projectId", "newId");
+CREATE UNIQUE INDEX "Transco_Establishment_projectId_transcoEstablishmentNewId_key" ON "Transco_Establishment"("projectId", "transcoEstablishmentNewId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Transco_Person_slug_key" ON "Transco_Person"("slug");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Transco_Person_projectId_newId_key" ON "Transco_Person"("projectId", "newId");
+CREATE UNIQUE INDEX "Transco_Person_projectId_transcoEmployeeNewId_key" ON "Transco_Person"("projectId", "transcoEmployeeNewId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Transco_WorkContract_slug_key" ON "Transco_WorkContract"("slug");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Transco_WorkContract_projectId_siren_newId_key" ON "Transco_WorkContract"("projectId", "siren", "newId");
+CREATE UNIQUE INDEX "Transco_WorkContract_projectId_siren_transcoContractNewId_key" ON "Transco_WorkContract"("projectId", "siren", "transcoContractNewId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Transco_WorkContract_projectId_numSS_contractId_key" ON "Transco_WorkContract"("projectId", "numSS", "contractId");
@@ -966,7 +966,7 @@ ALTER TABLE "Extraction_Data" ADD CONSTRAINT "Extraction_Data_projectId_fkey" FO
 ALTER TABLE "Extraction_Data" ADD CONSTRAINT "Extraction_Data_extractionLabel_fileLabel_projectId_fkey" FOREIGN KEY ("extractionLabel", "fileLabel", "projectId") REFERENCES "Extraction_File"("extractionLabel", "fileLabel", "projectId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Extraction_Data" ADD CONSTRAINT "Extraction_Data_softwareLabel_fkey" FOREIGN KEY ("softwareLabel") REFERENCES "Software"("label") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Extraction_Data" ADD CONSTRAINT "Extraction_Data_softwareLabel_fkey" FOREIGN KEY ("softwareLabel") REFERENCES "Software"("label") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Dsn_Value_Exist" ADD CONSTRAINT "Dsn_Value_Exist_dsnId_fkey" FOREIGN KEY ("dsnId") REFERENCES "Dsn"("id") ON DELETE CASCADE ON UPDATE CASCADE;

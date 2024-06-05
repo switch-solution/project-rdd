@@ -13,6 +13,15 @@ export const createExtraction = authorizationProject(ExtractionCreateSchema, asy
     let extractionSlug: string;
     const project = new Project(projectSlug);
     try {
+        const extractionExist = await prisma.extraction.findFirst({
+            where: {
+                projectId,
+                label
+            }
+        })
+        if (extractionExist) {
+            throw new ActionError('Le libellé de l\'extraction existe déjà')
+        }
         const countExtraction = await prisma.extraction.count({
             where: {
                 projectId

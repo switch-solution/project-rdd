@@ -49,9 +49,8 @@ model Session {
     userId       String
     expires      DateTime
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
 }
 
 model VerificationToken {
@@ -381,17 +380,17 @@ model Society {
 }
 
 model Transco_Society {
-    projectId String
-    Project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-    siren     String
-    newId     String?
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    createdBy String
-    slug      String   @unique @default(cuid())
+    projectId           String
+    Project             Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    siren               String
+    transcoSocietyNewId String?
+    createdAt           DateTime @default(now())
+    updatedAt           DateTime @updatedAt
+    createdBy           String
+    slug                String   @unique @default(cuid())
 
     @@id([projectId, siren])
-    @@unique([projectId, newId])
+    @@unique([projectId, transcoSocietyNewId])
 }
 
 model Establishment {
@@ -416,18 +415,18 @@ model Establishment {
 }
 
 model Transco_Establishment {
-    projectId String
-    Project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-    siren     String
-    nic       String
-    newId     String?
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    createdBy String
-    slug      String   @unique @default(cuid())
+    projectId                 String
+    Project                   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    siren                     String
+    nic                       String
+    transcoEstablishmentNewId String?
+    createdAt                 DateTime @default(now())
+    updatedAt                 DateTime @updatedAt
+    createdBy                 String
+    slug                      String   @unique @default(cuid())
 
     @@id([projectId, siren, nic])
-    @@unique([projectId, newId])
+    @@unique([projectId, transcoEstablishmentNewId])
 }
 
 model Person {
@@ -489,21 +488,21 @@ model Person_Bank {
 }
 
 model Transco_Person {
-    projectId String
-    Project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-    siret     String
-    numSS     String
-    lastname  String
-    firstname String
-    oldId     String
-    newId     String?
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    createdBy String
-    slug      String   @unique @default(cuid())
+    projectId            String
+    Project              Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    siret                String
+    numSS                String
+    lastname             String
+    firstname            String
+    oldId                String
+    transcoEmployeeNewId String?
+    createdAt            DateTime @default(now())
+    updatedAt            DateTime @updatedAt
+    createdBy            String
+    slug                 String   @unique @default(cuid())
 
     @@id([projectId, numSS])
-    @@unique([projectId, newId])
+    @@unique([projectId, transcoEmployeeNewId])
 }
 
 model WorkContract {
@@ -514,7 +513,7 @@ model WorkContract {
     siren                       String
     nic                         String
     Establishment               Establishment @relation(fields: [dsnId, siren, nic], references: [dsnId, siren, nic], onDelete: Cascade)
-    startDate                   DateTime
+    startDate                   String
     status                      String
     retirement                  String
     pcs                         String
@@ -523,7 +522,7 @@ model WorkContract {
     employmentLabel             String
     contract                    String
     publicDispPolitic           String
-    contractEndDate             DateTime
+    contractEndDate             String
     DNACodeUnitTime             String
     DSNWorkQuotaEstablishment   String
     DSNWorkQuotaWorkContract    String
@@ -541,9 +540,9 @@ model WorkContract {
     unemployment                String?
     idPublicEmployer            String?
     methodUnemployment          String?
-    joiningDate                 DateTime?
-    denunciationDate            DateTime?
-    dateManagementAgreement     DateTime?
+    joiningDate                 String?
+    denunciationDate            String?
+    dateManagementAgreement     String?
     idAgreement                 String?
     healthRiskDelegate          String?
     multipleJobCode             String
@@ -590,7 +589,7 @@ model WorkContract {
     grade                       String?
     cti                         String?
     finess                      String?
-    dateStart                   DateTime?
+    dateStart                   String?
     Project                     Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
     Dsn                         Dsn           @relation(fields: [dsnId], references: [id], onDelete: Cascade)
     Person                      Person        @relation(fields: [dsnId, numSS], references: [dsnId, numSS], onDelete: Cascade)
@@ -602,24 +601,24 @@ model WorkContract {
 }
 
 model Transco_WorkContract {
-    projectId  String
-    Project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-    siren      String
-    nic        String
-    siret      String
-    numSS      String
-    firstname  String
-    lastname   String
-    contractId String
-    employeeId String
-    newId      String?
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
-    createdBy  String
-    slug       String   @unique @default(cuid())
+    projectId            String
+    Project              Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    siren                String
+    nic                  String
+    siret                String
+    numSS                String
+    firstname            String
+    lastname             String
+    contractId           String
+    employeeId           String
+    transcoContractNewId String?
+    createdAt            DateTime @default(now())
+    updatedAt            DateTime @updatedAt
+    createdBy            String
+    slug                 String   @unique @default(cuid())
 
     @@id([projectId, numSS, contractId])
-    @@unique([projectId, siren, newId])
+    @@unique([projectId, siren, transcoContractNewId])
     @@unique([projectId, numSS, contractId])
 }
 
@@ -723,9 +722,9 @@ model Extraction_Data {
     createdAt       DateTime        @default(now())
     updatedAt       DateTime        @updatedAt
     createdBy       String
-    softwareLabel   String
-    Software        Software        @relation(fields: [softwareLabel], references: [label])
     slug            String          @unique @default(cuid())
+    Software        Software?       @relation(fields: [softwareLabel], references: [label])
+    softwareLabel   String?
 
     @@id([projectId, extractionLabel, fileLabel, columnLabel, rowOrder])
 }

@@ -36,6 +36,7 @@ export default async function Page({ params }: { params: { projectSlug: string, 
     const transco = new Transco(slug, type)
     const getTransco = await transco.getTransco()
 
+
     return (
         <Container>
             <ContainerBreadCrumb>
@@ -63,7 +64,7 @@ export default async function Page({ params }: { params: { projectSlug: string, 
                 </Breadcrumb>
             </ContainerBreadCrumb>
             <ContainerForm>
-                <EditTransco projectSlug={params.projectSlug} transcoSlug={slug} newId={getTransco.newId} type={type} />
+                <EditTransco projectSlug={params.projectSlug} transcoSlug={slug} newId={getTransco} type={type} />
             </ContainerForm>
 
         </Container>

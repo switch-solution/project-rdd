@@ -38,7 +38,7 @@ export default async function Page({ params }: { params: { projectSlug: string }
             firstname: transco.firstname,
             siret: transco.siret,
             contractId: transco.contractId,
-            newId: transco.newId,
+            newId: transco.transcoContractNewId,
             numSS: transco.numSS,
             employeeId: transco.employeeId
 

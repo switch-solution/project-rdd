@@ -35,7 +35,7 @@ export default async function Page({ params }: { params: { projectSlug: string }
             projectSlug: params.projectSlug,
             slug: transco.slug,
             siren: transco.siren,
-            newId: transco.newId
+            newId: transco.transcoSocietyNewId
         }
     })
     return (

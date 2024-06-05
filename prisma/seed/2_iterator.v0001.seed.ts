@@ -86,7 +86,7 @@ class IteratorV0001 extends Seed {
                         {
                             typeValue: 'Champ standard',
                             table: 'Transco_Society',
-                            field: 'newId',
+                            field: 'transcoSocietyNewId',
                             label: 'Société transcodification code',
                             type: 'string',
                             minLength: 1,

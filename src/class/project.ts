@@ -263,7 +263,7 @@ export class Project extends Logger {
                     },
                 },
                 orderBy: {
-                    createdAt: 'desc'
+                    dsnMonth: 'desc'
                 }
             })
             return dsn

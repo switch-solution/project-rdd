@@ -264,7 +264,7 @@ class IteratorV0002 extends Seed {
                         {
                             typeValue: 'Champ standard',
                             table: 'Transco_Person',
-                            field: 'newId',
+                            field: 'transcoEmployeeNewId',
                             label: 'Individu transcodification matricule',
                             type: 'string',
                             minLength: 1,
@@ -541,7 +541,12 @@ class IteratorV0002 extends Seed {
                             iteratorLabel: 'Contrat de travail',
                             typeValue: 'Champ standard',
                             fieldLabel: 'Contrat de travail libellé emploi'
-                        }
+                        },
+                        {
+                            iteratorLabel: 'Contrat de travail',
+                            typeValue: 'Champ standard',
+                            fieldLabel: 'Individu transcodification matricule'
+                        },
 
 
                     ]
@@ -606,7 +611,7 @@ class IteratorV0002 extends Seed {
                         {
                             typeValue: 'Champ standard',
                             table: 'Transco_Establishment',
-                            field: 'newId',
+                            field: 'transcoEstablishmentNewId',
                             label: 'Etablissement transcodification code',
                             type: 'string',
                             minLength: 1,
@@ -657,10 +662,7 @@ class IteratorV0002 extends Seed {
                     ]
                 })
 
-
                 await this.seedUpdateStatus("completed")
-
-
             }
 
 

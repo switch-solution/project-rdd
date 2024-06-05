@@ -10,7 +10,7 @@ export class Extraction {
             const extraction = await prisma.extraction.findUniqueOrThrow({
                 where: {
                     slug: this.slug
-                }
+                },
             })
             return extraction
         } catch (err: unknown) {
@@ -40,7 +40,8 @@ export class Extraction {
                     Extraction: {
                         slug: this.slug
                     }
-                }
+                },
+
             })
             const countRows: {
                 fileLabel: string,

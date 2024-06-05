@@ -209,9 +209,8 @@ export const uploadFileDsn = authorizationProject(dsnDataSchema, async (values: 
         const workContractsList = workContracts.map((workContract) => {
             return {
                 ...workContract,
-                contractEndDate: workContract.contractEndDate ? convertToDate(workContract.contractEndDate) : new Date(-0o1),
-                startDate: convertToDate(workContract.startDate),
                 projectId: projectId,
+                contractEndDate: workContract.contractEndDate ? workContract.contractEndDate : '',
                 createdBy: userId,
                 dsnId: dsnId.id,
                 nic: dsnEstablishment.nic,

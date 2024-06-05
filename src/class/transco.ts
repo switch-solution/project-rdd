@@ -11,33 +11,49 @@ export class Transco {
         try {
             switch (this.type) {
                 case "society":
-                    return await prisma.transco_Society.findUniqueOrThrow({
+                    const society = await prisma.transco_Society.findUniqueOrThrow({
                         where: {
                             slug: this.slug
                         },
+                        select: {
+                            transcoSocietyNewId: true
+                        }
 
                     })
+                    return society.transcoSocietyNewId
                     break;
                 case "establishment":
-                    return await prisma.transco_Establishment.findUniqueOrThrow({
+                    const establishment = await prisma.transco_Establishment.findUniqueOrThrow({
                         where: {
-                            slug: this.slug
+                            slug: this.slug,
+                        },
+                        select: {
+                            transcoEstablishmentNewId: true
                         }
                     })
+                    return establishment.transcoEstablishmentNewId
                     break;
                 case "person":
-                    return await prisma.transco_Person.findUniqueOrThrow({
+                    const person = await prisma.transco_Person.findUniqueOrThrow({
                         where: {
                             slug: this.slug
+                        },
+                        select: {
+                            transcoEmployeeNewId: true
                         }
                     })
+                    return person.transcoEmployeeNewId
                     break;
                 case "workcontract":
-                    return await prisma.transco_WorkContract.findUniqueOrThrow({
+                    const workContract = await prisma.transco_WorkContract.findUniqueOrThrow({
                         where: {
                             slug: this.slug
+                        },
+                        select: {
+                            transcoContractNewId: true
                         }
                     })
+                    return workContract.transcoContractNewId
                     break;
                 default: throw new Error('Type de transcodification inconnu')
             }
@@ -54,7 +70,7 @@ export class Transco {
                 case "society":
                     const society = await prisma.transco_Society.findFirst({
                         where: {
-                            newId: newId,
+                            transcoSocietyNewId: newId,
                             projectId
                         }
                     })
@@ -67,7 +83,7 @@ export class Transco {
                 case "establishment":
                     const establishment = await prisma.transco_Establishment.findFirst({
                         where: {
-                            newId: newId,
+                            transcoEstablishmentNewId: newId,
                             projectId
                         }
                     })
@@ -80,7 +96,7 @@ export class Transco {
                 case "person":
                     const person = await prisma.transco_Person.findFirst({
                         where: {
-                            newId: newId,
+                            transcoEmployeeNewId: newId,
                             projectId
                         }
                     })
@@ -93,7 +109,7 @@ export class Transco {
                 case "workcontract":
                     const workContract = await prisma.transco_WorkContract.findFirst({
                         where: {
-                            newId: newId,
+                            transcoContractNewId: newId,
                             projectId
                         }
                     })
@@ -121,7 +137,7 @@ export class Transco {
                             slug: this.slug
                         },
                         data: {
-                            newId: newId
+                            transcoSocietyNewId: newId
                         }
                     })
                     break;
@@ -131,7 +147,7 @@ export class Transco {
                             slug: this.slug
                         },
                         data: {
-                            newId: newId
+                            transcoEstablishmentNewId: newId
                         }
                     })
                     break;
@@ -141,7 +157,7 @@ export class Transco {
                             slug: this.slug
                         },
                         data: {
-                            newId: newId
+                            transcoEmployeeNewId: newId
                         }
                     })
                     break;
@@ -151,7 +167,7 @@ export class Transco {
                             slug: this.slug
                         },
                         data: {
-                            newId: newId
+                            transcoContractNewId: newId
                         }
                     })
                     break;
