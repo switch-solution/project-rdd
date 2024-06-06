@@ -401,6 +401,91 @@ CREATE TABLE "Person" (
 );
 
 -- CreateTable
+CREATE TABLE "Person_Children" (
+    "numSS" TEXT NOT NULL,
+    "projectId" TEXT NOT NULL,
+    "lastname" TEXT NOT NULL,
+    "firstname" TEXT NOT NULL,
+    "birthday" TIMESTAMP(3) NOT NULL,
+    "sex" TEXT NOT NULL,
+    "order" INTEGER NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdBy" TEXT NOT NULL,
+
+    CONSTRAINT "Person_Children_pkey" PRIMARY KEY ("projectId","numSS","order")
+);
+
+-- CreateTable
+CREATE TABLE "Transco_Domain_Email" (
+    "projectId" TEXT NOT NULL,
+    "domain" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdBy" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
+
+    CONSTRAINT "Transco_Domain_Email_pkey" PRIMARY KEY ("projectId","domain")
+);
+
+-- CreateTable
+CREATE TABLE "Person_Analytic" (
+    "projectId" TEXT NOT NULL,
+    "numSS" TEXT NOT NULL,
+    "siren" TEXT NOT NULL,
+    "axis" TEXT NOT NULL,
+    "section" TEXT NOT NULL,
+    "order" INTEGER NOT NULL,
+    "percentage" DOUBLE PRECISION NOT NULL,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdBy" TEXT NOT NULL,
+
+    CONSTRAINT "Person_Analytic_pkey" PRIMARY KEY ("projectId","numSS","axis","section")
+);
+
+-- CreateTable
+CREATE TABLE "Mutual" (
+    "dsnId" TEXT NOT NULL,
+    "projectId" TEXT NOT NULL,
+    "contractId" TEXT NOT NULL,
+    "organisme" TEXT NOT NULL,
+    "siren" TEXT NOT NULL,
+    "delegate" TEXT,
+    "covererd" TEXT,
+    "techId" TEXT,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdBy" TEXT NOT NULL DEFAULT 'system',
+
+    CONSTRAINT "Mutual_pkey" PRIMARY KEY ("projectId","dsnId","siren","contractId")
+);
+
+-- CreateTable
+CREATE TABLE "Person_Mutual" (
+    "dsnId" TEXT NOT NULL,
+    "projectId" TEXT NOT NULL,
+    "numSS" TEXT NOT NULL,
+    "contractId" TEXT NOT NULL,
+    "organisme" TEXT NOT NULL,
+    "siren" TEXT NOT NULL,
+    "delegate" TEXT,
+    "techId" TEXT,
+    "option" TEXT,
+    "pop" TEXT,
+    "children" TEXT,
+    "assign" TEXT,
+    "numberAssign" TEXT,
+    "otheAssign" TEXT,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdBy" TEXT NOT NULL DEFAULT 'system',
+
+    CONSTRAINT "Person_Mutual_pkey" PRIMARY KEY ("projectId","dsnId","siren","numSS","contractId")
+);
+
+-- CreateTable
 CREATE TABLE "Person_Bank" (
     "projectId" TEXT NOT NULL,
     "numSS" TEXT NOT NULL,
@@ -701,8 +786,8 @@ CREATE TABLE "Template_Column" (
     "description" TEXT NOT NULL,
     "order" INTEGER NOT NULL,
     "slug" TEXT NOT NULL,
-    "minLength" INTEGER NOT NULL,
-    "maxLength" INTEGER NOT NULL,
+    "minLength" INTEGER,
+    "maxLength" INTEGER,
     "type" TEXT,
     "format" TEXT,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -762,6 +847,12 @@ CREATE UNIQUE INDEX "Transco_Establishment_slug_key" ON "Transco_Establishment"(
 CREATE UNIQUE INDEX "Transco_Establishment_projectId_transcoEstablishmentNewId_key" ON "Transco_Establishment"("projectId", "transcoEstablishmentNewId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Transco_Domain_Email_slug_key" ON "Transco_Domain_Email"("slug");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Person_Analytic_projectId_numSS_axis_order_key" ON "Person_Analytic"("projectId", "numSS", "axis", "order");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Transco_Person_slug_key" ON "Transco_Person"("slug");
 
 -- CreateIndex
@@ -816,10 +907,10 @@ ALTER TABLE "User_Project" ADD CONSTRAINT "User_Project_projectId_fkey" FOREIGN 
 ALTER TABLE "Project" ADD CONSTRAINT "Project_softwareLabel_fkey" FOREIGN KEY ("softwareLabel") REFERENCES "Software"("label") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Iterator_Standard_Field" ADD CONSTRAINT "Iterator_Standard_Field_iteratorLabel_fkey" FOREIGN KEY ("iteratorLabel") REFERENCES "Iterator"("label") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Iterator_Standard_Field" ADD CONSTRAINT "Iterator_Standard_Field_iteratorLabel_fkey" FOREIGN KEY ("iteratorLabel") REFERENCES "Iterator"("label") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Iterator_Standard_Field" ADD CONSTRAINT "Iterator_Standard_Field_fieldLabel_fkey" FOREIGN KEY ("fieldLabel") REFERENCES "Standard_Field"("label") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Iterator_Standard_Field" ADD CONSTRAINT "Iterator_Standard_Field_fieldLabel_fkey" FOREIGN KEY ("fieldLabel") REFERENCES "Standard_Field"("label") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Standard_Field" ADD CONSTRAINT "Standard_Field_type_format_fkey" FOREIGN KEY ("type", "format") REFERENCES "Format"("type", "format") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -904,6 +995,36 @@ ALTER TABLE "Person" ADD CONSTRAINT "Person_projectId_fkey" FOREIGN KEY ("projec
 
 -- AddForeignKey
 ALTER TABLE "Person" ADD CONSTRAINT "Person_dsnId_siren_nic_fkey" FOREIGN KEY ("dsnId", "siren", "nic") REFERENCES "Establishment"("dsnId", "siren", "nic") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Person_Children" ADD CONSTRAINT "Person_Children_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Transco_Domain_Email" ADD CONSTRAINT "Transco_Domain_Email_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Person_Analytic" ADD CONSTRAINT "Person_Analytic_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Mutual" ADD CONSTRAINT "Mutual_dsnId_fkey" FOREIGN KEY ("dsnId") REFERENCES "Dsn"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Mutual" ADD CONSTRAINT "Mutual_dsnId_siren_fkey" FOREIGN KEY ("dsnId", "siren") REFERENCES "Society"("dsnId", "siren") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Mutual" ADD CONSTRAINT "Mutual_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Person_Mutual" ADD CONSTRAINT "Person_Mutual_dsnId_fkey" FOREIGN KEY ("dsnId") REFERENCES "Dsn"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Person_Mutual" ADD CONSTRAINT "Person_Mutual_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Person_Mutual" ADD CONSTRAINT "Person_Mutual_dsnId_numSS_fkey" FOREIGN KEY ("dsnId", "numSS") REFERENCES "Person"("dsnId", "numSS") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Person_Mutual" ADD CONSTRAINT "Person_Mutual_projectId_dsnId_siren_contractId_fkey" FOREIGN KEY ("projectId", "dsnId", "siren", "contractId") REFERENCES "Mutual"("projectId", "dsnId", "siren", "contractId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Person_Bank" ADD CONSTRAINT "Person_Bank_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE CASCADE;

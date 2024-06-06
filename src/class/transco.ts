@@ -1,8 +1,9 @@
 import { prisma } from "@/lib/prisma"
+import type { TypeTransco } from "@/src/helpers/typeTransco"
 export class Transco {
     slug: string
-    type: 'society' | 'establishment' | 'person' | 'workcontract'
-    constructor(slug: string, type: 'society' | 'establishment' | 'person' | 'workcontract') {
+    type: TypeTransco
+    constructor(slug: string, type: TypeTransco) {
         this.slug = slug
         this.type = type
 
@@ -54,6 +55,17 @@ export class Transco {
                         }
                     })
                     return workContract.transcoContractNewId
+                    break;
+                case "domainEmail":
+                    const domainEmail = await prisma.transco_Domain_Email.findUniqueOrThrow({
+                        where: {
+                            slug: this.slug
+                        },
+                        select: {
+                            type: true
+                        }
+                    })
+                    return domainEmail.type
                     break;
                 default: throw new Error('Type de transcodification inconnu')
             }
@@ -120,6 +132,15 @@ export class Transco {
                     }
 
                     break;
+                case "domainEmail":
+                    const domainEmail = await prisma.transco_Domain_Email.findFirst({
+                        where: {
+                            type: newId,
+                            projectId
+                        }
+                    })
+                    break
+
                 default: throw new Error('Type de transcodification inconnu')
             }
         } catch (err) {
@@ -171,7 +192,21 @@ export class Transco {
                         }
                     })
                     break;
-                default: throw new Error('Type de transcodification inconnu')
+                case "domainEmail":
+                    const values = ['personnel', 'professionnel']
+                    if (!values.includes(newId)) {
+                        throw new Error(`Type d'email non valide ${newId}`)
+                    }
+                    return await prisma.transco_Domain_Email.update({
+                        where: {
+                            slug: this.slug
+                        },
+                        data: {
+                            type: newId
+                        }
+                    })
+                    break;
+                default: throw new Error('Type de transcodification inconnu impossible de mttre à jour')
             }
         } catch (err) {
             console.error(err)

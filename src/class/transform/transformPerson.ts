@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma"
 import type { ITransform, Person } from "@/src/class/transform/iTransform"
 import { Transform } from "@/src/class/transform/transform";
+import type { IteratorLabel } from "@/src/helpers/typeTransco";
 export class TransformPerson extends Transform implements ITransform {
     projectId: string;
     extractionLabel: string;
@@ -9,7 +10,8 @@ export class TransformPerson extends Transform implements ITransform {
     numSS?: string;
     contractId?: string;
     siren?: string;
-    constructor(props: { projectId: string; extractionLabel: string; userId: string; fileLabel: string; numSS?: string; contractId?: string; siren?: string; }) {
+    iteratorLabel: IteratorLabel;
+    constructor(props: { projectId: string; extractionLabel: string; userId: string; fileLabel: string; numSS?: string; contractId?: string; siren?: string; iteratorLabel: IteratorLabel }) {
         super(props)
         this.projectId = props.projectId
         this.extractionLabel = props.extractionLabel
@@ -18,6 +20,7 @@ export class TransformPerson extends Transform implements ITransform {
         this.numSS = props.numSS
         this.contractId = props.contractId
         this.siren = props.siren
+        this.iteratorLabel = props.iteratorLabel
 
     }
     data = async ({ numSS, contractId, siren }: { numSS?: string, contractId?: string, siren?: string }) => {
@@ -73,12 +76,30 @@ export class TransformPerson extends Transform implements ITransform {
                 transcoEmployeeNewId: true
             }
         })
+
+        const emailPerson = await prisma.person.findFirst({
+            where: {
+                numSS
+            },
+            select: {
+                email: true
+            }
+        })
+        const transcoEmail = await prisma.transco_Domain_Email.findMany({
+            where: {
+                projectId: this.projectId,
+            }
+        })
+        const emailPersonDomain = emailPerson?.email?.split('@')[1]
+        const emailDomain = transcoEmail.find(e => e.domain === emailPersonDomain)
+        const emailPerso = emailDomain?.type === 'personnel' ? emailPerson?.email : ''
+        const emailPro = emailDomain?.type === 'professionnel' ? emailPerson?.email : ''
         return {
             ...person,
             ...transcoPerson,
-            ...persnBank
-
-
+            ...persnBank,
+            emailPerso,
+            emailPro
         }
     }
 
@@ -96,7 +117,7 @@ export class TransformPerson extends Transform implements ITransform {
             if (!columns) {
                 throw new Error("Les colonnes n'ont pas été trouvé")
             }
-            const standardField = await this.standardField('Individu')
+            const standardField = await this.standardField(this.iteratorLabel)
             await this.process({ columns, datas, standardField })
 
         } catch (err: unknown) {
@@ -105,7 +126,7 @@ export class TransformPerson extends Transform implements ITransform {
         }
     }
 
-    standardField = async (iterator: "Société" | "Contrat de travail" | "Individu") => {
+    standardField = async (iterator: IteratorLabel) => {
         try {
             if (iterator !== "Individu") {
                 throw new Error("L'itérateur doit être 'individu'")

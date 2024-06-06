@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma"
-import type { FormatDate, ExtractionData, Column } from "@/src/class/transform/iTransform";
-import { Society, Person, WorkContract } from "@/src/class/transform/iTransform";
+import type { FormatDate, ExtractionData, Column, PersonEmail } from "@/src/class/transform/iTransform";
+import { Society, Person, WorkContract, Child } from "@/src/class/transform/iTransform";
+import type { IteratorLabel } from "@/src/helpers/typeTransco";
 export class Transform {
 
     projectId: string;
@@ -68,7 +69,7 @@ export class Transform {
         standardField
     }: {
         columns: Column[],
-        datas: Society | Person | WorkContract,
+        datas: Society | Person | WorkContract | PersonEmail | Child,
         standardField: {
             label: string,
             field: string
@@ -154,7 +155,7 @@ export class Transform {
         }
 
     }
-    loadStandardField = async (iteratorLabel: 'Société' | 'Individu' | 'Contrat de travail' | 'Etablissement') => {
+    loadStandardField = async (iteratorLabel: IteratorLabel) => {
         try {
             const load = await prisma.iterator_Standard_Field.findMany({
                 where: {

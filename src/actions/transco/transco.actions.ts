@@ -160,6 +160,56 @@ export const createTranscoPerson = authorizationProject(TranscoGenerateSchema, a
 
 })
 
+export const createTranscoDomainEmail = authorizationProject(TranscoGenerateSchema, async (values: z.infer<typeof TranscoGenerateSchema>, { userId, projectId }) => {
+    const { projectSlug, type } = TranscoGenerateSchema.parse(values);
+    if (type !== 'domainEmail') {
+        throw new ActionError("Le type doit être domainEmail")
+    }
+    try {
+        const emails = await prisma.person.groupBy({
+            by: ['email'],
+            where: {
+                Project: {
+                    slug: projectSlug
+                },
+                email: {
+                    not: ''
+                }
+            }
+        })
+        await prisma.transco_Domain_Email.deleteMany({
+            where: {
+                projectId
+            }
+        })
+        if (emails) {
+            const domainList = emails.map(email => {
+                if (email.email) {
+                    const domain = email.email.split('@')[1]
+                    return domain
+                }
+            })
+
+            await prisma.transco_Domain_Email.createMany({
+                data: domainList.map(domain => (
+                    {
+                        domain: domain ? domain : "",
+                        projectId,
+                        type: 'En attente',
+                        createdBy: userId
+                    }))
+            })
+        }
+
+
+    } catch (err: unknown) {
+        console.error(err)
+        throw new ActionError(err as string);
+    }
+    revalidatePath(`/project/${projectSlug}/transco/domainEmail`);
+    redirect(`/project/${projectSlug}/transco/domainEmail`);
+})
+
 export const createTranscoWorkcontract = authorizationProject(TranscoGenerateSchema, async (values: z.infer<typeof TranscoGenerateSchema>, { userId, projectId }) => {
     const { projectSlug, type } = TranscoGenerateSchema.parse(values);
     if (type !== 'workcontract') {

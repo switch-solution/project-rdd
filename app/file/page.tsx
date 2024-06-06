@@ -21,7 +21,11 @@ export default async function Page() {
     if (!session.user?.id) {
         throw new Error("Vous êtes déjà connecté")
     }
-    const files = await prisma.file.findMany()
+    const files = await prisma.file.findMany({
+        orderBy: {
+            softwareLabel: 'asc'
+        }
+    })
 
     return (
         <Container>

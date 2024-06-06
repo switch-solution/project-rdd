@@ -32,6 +32,7 @@ export default async function Page({ params }: { params: { fileSlug: string } })
             description: column.description,
             label: column.label,
             type: column.type,
+            standardFieldLabel: column.standardFieldLabel,
         }
     })
     return (

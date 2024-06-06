@@ -3,7 +3,8 @@
 import { ColumnDef } from "@tanstack/react-table"
 import ButtonStartMigration from "@/components/button/ButtonStartMigration"
 import Link from "next/link"
-import type { IdListPerson, IdListSociety, IdListWorkContract } from "@/src/helpers/type";
+import type { IdListPerson, IdListSociety, IdListWorkContract, } from "@/src/helpers/type";
+import type { IteratorLabel } from "@/src/helpers/typeTransco";
 
 export type Extraction = {
     projectSlug: string
@@ -60,7 +61,7 @@ export const columns: ColumnDef<Extraction>[] = [
                     extractionSlug={row.original.extractionSlug}
                     projectFileSlug={row.original.projectFileSlug}
                     idList={row.original.idList}
-                    iteratorLabel={row.original.iteratorLabel as 'Société' | 'Individu' | 'Contrat de travail'}
+                    iteratorLabel={row.original.iteratorLabel as IteratorLabel}
                     status={row.original.status as 'En attente' | 'Terminé'}
                 />
             )
@@ -70,7 +71,6 @@ export const columns: ColumnDef<Extraction>[] = [
         header: "Exporter au format Excel",
         id: 'excel',
         cell: ({ row }) => {
-            const extraction = row.original
             return (
                 <Link href={`/project/${row.original.projectSlug}/extraction/${row.original.extractionSlug}/data/${row.original.extractionFileSlug}`}>Excel</Link>
             )

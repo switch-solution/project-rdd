@@ -15,6 +15,16 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form"
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 export default function EditTransco({ projectSlug, transcoSlug, newId, type }: { projectSlug: string, transcoSlug: string, newId: string | null, type: TypeTransco }) {
@@ -100,21 +110,48 @@ export default function EditTransco({ projectSlug, transcoSlug, newId, type }: {
                     )}
 
                 />
-                <FormField
+                {type === "domainEmail" && <FormField
                     control={form.control}
                     name="newId"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Nouveau code</FormLabel>
-                            <FormControl>
-                                <Input placeholder="0001" required {...field} />
-                            </FormControl>
+                            <FormLabel>Email</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Select a verified email to display" />
+                                    </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    <SelectItem value="personnel">Personnel</SelectItem>
+                                    <SelectItem value="professionnel">Professionnel</SelectItem>
+                                </SelectContent>
+                            </Select>
+
                             <FormMessage />
                         </FormItem>
-
                     )}
-
                 />
+                }
+                {type !== "domainEmail" &&
+
+                    <FormField
+                        control={form.control}
+                        name="newId"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Nouveau code</FormLabel>
+                                <FormControl>
+                                    <Input placeholder="0001" required {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+
+                        )}
+
+                    />
+                }
+
 
                 <Button type="submit" disabled={loading}>Envoyer</Button>
 

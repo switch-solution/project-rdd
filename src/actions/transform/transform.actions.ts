@@ -7,6 +7,7 @@ import { ProjectFile } from '@/src/class/projectFile';
 import { Project } from '@/src/class/project'
 import { Extraction } from '@/src/class/extraction';
 import { TransformFactory } from '@/src/class/transform/transformFactory';
+import { IteratorLabel } from '@/src/helpers/typeTransco';
 export const createTransform = authorizationProject(TranformCreateSchema, async (values: z.infer<typeof TranformCreateSchema>, { userId, projectId }) => {
     const { projectSlug, projectFileSlug, extractionSlug, numSS, siren, contractId } = TranformCreateSchema.parse(values)
     const project = new Project(projectSlug)
@@ -26,7 +27,7 @@ export const createTransform = authorizationProject(TranformCreateSchema, async 
         throw new ActionError("L'extraction a déjà été traitée")
     }
     const transform = TransformFactory.createTransform({
-        iteratorLabel: projectFileDetail.iteratorLabel as 'Société' | 'Etablissement' | 'Individu' | 'Contrat de travail',
+        iteratorLabel: projectFileDetail.iteratorLabel as IteratorLabel,
         projectId,
         extractionLabel: extractionDetail.label,
         userId,
@@ -38,7 +39,6 @@ export const createTransform = authorizationProject(TranformCreateSchema, async 
     })
     try {
         await transform.transform()
-
     } catch (err: unknown) {
         throw new ActionError(err as string)
     }

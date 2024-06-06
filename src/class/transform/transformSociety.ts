@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma"
 import type { ITransform, Society } from "@/src/class/transform/iTransform"
 import { Transform } from "@/src/class/transform/transform";
+import type { IteratorLabel } from "@/src/helpers/typeTransco";
+
 export class TransformSociety extends Transform implements ITransform {
     projectId: string;
     extractionLabel: string;
@@ -9,7 +11,8 @@ export class TransformSociety extends Transform implements ITransform {
     numSS?: string;
     contractId?: string;
     siren?: string;
-    constructor(props: { projectId: string; extractionLabel: string; userId: string; fileLabel: string; numSS?: string; contractId?: string; siren?: string; }) {
+    iteratorLabel: IteratorLabel;
+    constructor(props: { projectId: string; extractionLabel: string; userId: string; fileLabel: string; numSS?: string; contractId?: string; siren?: string; iteratorLabel: IteratorLabel }) {
         super(props)
         this.projectId = props.projectId
         this.extractionLabel = props.extractionLabel
@@ -18,6 +21,7 @@ export class TransformSociety extends Transform implements ITransform {
         this.numSS = props.numSS
         this.contractId = props.contractId
         this.siren = props.siren
+        this.iteratorLabel = props.iteratorLabel
 
     }
     data = async ({ numSS, contractId, siren }: { numSS?: string, contractId?: string, siren?: string }) => {
@@ -70,7 +74,7 @@ export class TransformSociety extends Transform implements ITransform {
             if (!columns) {
                 throw new Error("Les colonnes n'ont pas été trouvé")
             }
-            const standardField = await this.standardField('Société')
+            const standardField = await this.standardField(this.iteratorLabel)
             await this.process({ columns, datas, standardField })
 
 
@@ -80,7 +84,7 @@ export class TransformSociety extends Transform implements ITransform {
         }
     }
 
-    standardField = async (iterator: "Société" | "Contrat de travail") => {
+    standardField = async (iterator: IteratorLabel) => {
         try {
             if (iterator !== "Société") {
                 throw new Error("L'itérateur doit être 'Société'")

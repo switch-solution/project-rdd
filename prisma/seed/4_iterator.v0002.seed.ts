@@ -191,15 +191,6 @@ class IteratorV0002 extends Seed {
                         {
                             typeValue: 'Champ standard',
                             table: 'Person',
-                            field: 'email',
-                            label: 'Individu email',
-                            type: 'string',
-                            minLength: 1,
-                            maxLength: 50,
-                        },
-                        {
-                            typeValue: 'Champ standard',
-                            table: 'Person',
                             field: 'employeeId',
                             label: 'Individu matricule',
                             type: 'string',
@@ -308,7 +299,6 @@ class IteratorV0002 extends Seed {
                         {
                             iteratorLabel: 'Individu',
                             typeValue: 'Champ standard',
-
                             fieldLabel: 'Individu lieu de naissance'
                         },
                         {
@@ -354,7 +344,7 @@ class IteratorV0002 extends Seed {
                         {
                             iteratorLabel: 'Individu',
                             typeValue: 'Champ standard',
-                            fieldLabel: 'Individu email'
+                            fieldLabel: 'Individu matricule'
                         },
                         {
                             iteratorLabel: 'Individu',

@@ -1,3 +1,4 @@
+import type { IteratorLabel } from "@/src/helpers/typeTransco";
 export type Society = {
     transcoSocietyNewId: string | null,
     dsnId: string,
@@ -5,6 +6,18 @@ export type Society = {
     apen: string,
     zipCode: string,
     city: string,
+}
+export type Child = {
+    numSS: string,
+    lastname: string,
+    firstname: string,
+    birthday: Date,
+    sex: string,
+    order: number,
+}
+export type Children = {
+    children: Child[]
+    transcoEmployeeNewId: string | null,
 }
 export type WorkContract = {
     dsnId: string,
@@ -23,6 +36,15 @@ export type WorkContract = {
     idcc: string,
     transcoContractNewId: string | null,
     transcoEmployeeNewId: string | null,
+}
+
+export type PersonEmail = {
+    numSS: string,
+    emailPerso: string | null,
+    emailPro: string | null,
+    transcoEmployeeNewId: string | null,
+    siren: string,
+    transcoSocietyNewId: string | null,
 }
 export type Person = {
     transcoEmployeeNewId: string | null,
@@ -49,6 +71,8 @@ export type Person = {
     bank2?: string | null,
     advance?: boolean,
     expense?: boolean,
+    emailPerso?: string | null,
+    emailPro?: string | null,
 }
 
 export type ExtractionData = {
@@ -84,7 +108,8 @@ export interface ITransform {
     numSS?: string;
     contractId?: string;
     siren?: string;
-    data({ numSS, contractId, siren }: { numSS?: string, contractId?: string, siren?: string }): Promise<Society | Person | WorkContract>;
+    iteratorLabel: IteratorLabel;
+    data({ numSS, contractId, siren }: { numSS?: string, contractId?: string, siren?: string }): Promise<Society | Person | WorkContract | PersonEmail | Children>;
     transform(): Promise<void>;
     lastDsn(value: string): Promise<
         {
@@ -93,7 +118,7 @@ export interface ITransform {
         }
 
     >;
-    standardField(iterator: 'Société' | 'Contrat de travail'): Promise<
+    standardField(iterator: IteratorLabel): Promise<
         {
             label: string;
             field: string;
@@ -104,6 +129,6 @@ export interface ITransform {
     lastRow(): Promise<number>;
     convertFormatDate(value: string, format: FormatDate): Promise<string>;
     saveData(datasList: ExtractionData[]): Promise<void>;
-    process({ columns, datas, standardField }: { columns: Column[], datas: Society | Person | WorkContract, standardField: { label: string, field: string }[] }): Promise<void>;
+    process({ columns, datas, standardField }: { columns: Column[], datas: Society | Person | WorkContract | Child, standardField: { label: string, field: string }[] }): Promise<void>;
 
 }

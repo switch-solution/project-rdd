@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import { create } from "domain"
 
 export class Template {
     slug: string
@@ -62,6 +63,68 @@ export class Template {
         } catch (err: unknown) {
             console.error(err)
             throw new Error("Une erreur est survenue lors de la suppression des RIB")
+        }
+    }
+
+    deleteChildren = async (projectId: string) => {
+        try {
+            await prisma.person_Children.deleteMany({
+                where: {
+                    projectId: projectId
+                }
+            })
+
+        } catch (err: unknown) {
+            console.error(err)
+            throw new Error("Une erreur est survenue lors de la suppression des enfants")
+        }
+
+    }
+
+    insertChildren = async ({
+        projectId,
+        children,
+        userId
+    }: {
+        projectId: string,
+        children: {
+            'Numéro de sécurité sociale du salarié'?: string | null,
+            "Nom de lenfant"?: string | null,
+            "Prénom de lenfant"?: string | null,
+            "Date anniversaire de lenfant"?: number | null,
+            "Sexe de l'enfant"?: string | null,
+            "Numéro d'ordre de l'enfant"?: number | null
+
+        }[],
+        userId: string
+    }) => {
+        try {
+            const childrenList = []
+            const excelDateToJSDate = (date: number) => {
+                const utc_days = Math.floor(date - 25569);
+                const utc_value = utc_days * 86400;
+                const date_info = new Date(utc_value * 1000);
+
+                return date_info;
+            }
+            for (const child of children) {
+                childrenList.push({
+                    projectId: projectId,
+                    numSS: child['Numéro de sécurité sociale du salarié'] ? child['Numéro de sécurité sociale du salarié'] : '',
+                    lastname: child["Nom de lenfant"] ? child["Nom de lenfant"] : '',
+                    firstname: child["Prénom de lenfant"] ? child["Prénom de lenfant"] : '',
+                    birthday: child["Date anniversaire de lenfant"] ? excelDateToJSDate(child["Date anniversaire de lenfant"]) : new Date(),
+                    sex: child["Sexe de l'enfant"] ? child["Sexe de l'enfant"] : '',
+                    order: child["Numéro d'ordre de l'enfant"] ? child["Numéro d'ordre de l'enfant"] : 1,
+                    createdBy: userId,
+                })
+            }
+            await prisma.person_Children.createMany({
+                data: childrenList
+            })
+        } catch (err: unknown) {
+            console.error(err)
+            throw new Error("Une erreur est survenue lors de l'insertion des enfants")
         }
     }
 

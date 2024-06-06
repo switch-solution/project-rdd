@@ -98,6 +98,20 @@ export class Project extends Logger {
                     }
                 }
             })
+            const countMutual = await prisma.mutual.count({
+                where: {
+                    Project: {
+                        slug: this.slug
+                    }
+                }
+            })
+            const countChildren = await prisma.person_Children.count({
+                where: {
+                    Project: {
+                        slug: this.slug
+                    }
+                }
+            })
             return {
                 countDsn,
                 countNumSS: countNumSS.length,
@@ -110,7 +124,9 @@ export class Project extends Logger {
                 countTranscoJob,
                 countExtraction,
                 countPersonBank,
-                countWorkContract: countWorkContract.length
+                countWorkContract: countWorkContract.length,
+                countMutual,
+                countChildren
             }
         } catch (err) {
             console.error(err)
@@ -158,11 +174,36 @@ export class Project extends Logger {
                     contractId: true
                 }
             }) as unknown as IdListWorkContract[]
+            const transcoPersonEmail = await prisma.person.findMany({
+                where: {
+                    Project: {
+                        slug: this.slug
+                    },
+                    email: {
+                        not: null
+                    }
+                },
+                select: {
+                    numSS: true
+                }
+            }) as unknown as IdListPerson[]
+            const transcoPersonEnfant = await prisma.person_Children.findMany({
+                where: {
+                    Project: {
+                        slug: this.slug
+                    },
+                },
+                select: {
+                    numSS: true
+                }
+            })
             return {
                 transcoSociety,
                 transcoEstablishment,
                 transcoPerson,
-                transcoWorkContract
+                transcoWorkContract,
+                transcoPersonEmail,
+                transcoPersonEnfant
             }
         } catch (err) {
             console.error(err)
@@ -327,6 +368,25 @@ export class Project extends Logger {
             throw new Error('Erreur lors de la récupération des transcodifications')
         }
 
+    }
+
+    getTranscoDomainEmail = async () => {
+        try {
+            const transcoEmail = await prisma.transco_Domain_Email.findMany({
+                where: {
+                    Project: {
+                        slug: this.slug
+                    }
+                },
+                orderBy: {
+                    domain: 'asc'
+                }
+            })
+            return transcoEmail
+        } catch (err) {
+            console.error(err)
+            throw new Error('Erreur lors de la récupération des transcodifications')
+        }
     }
 
     getTranscoPerson = async () => {

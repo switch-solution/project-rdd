@@ -12,7 +12,7 @@ import { auth } from "@/lib/auth";
 import { Project } from "@/src/class/project";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { count } from "console";
+import { prisma } from "@/lib/prisma";
 export default async function Page({ params }: { params: { projectSlug: string } }) {
     const session = await auth()
     if (!session?.user?.id) {
@@ -39,11 +39,22 @@ export default async function Page({ params }: { params: { projectSlug: string }
         countExtraction,
         countPersonBank,
         countWorkContract,
-        countTranscoSociety
-
+        countTranscoSociety,
+        countMutual,
+        countChildren
     } = await project.count()
     const projectFile = await project.getFiles()
     const extractions = await project.getExtraction()
+
+    const templates = await prisma.template.findMany({
+        orderBy: {
+            label: 'asc'
+        },
+        select: {
+            label: true,
+            slug: true
+        }
+    })
     return (
         <Container>
             <ContainerBreadCrumb>
@@ -77,10 +88,13 @@ export default async function Page({ params }: { params: { projectSlug: string }
                     countExtraction,
                     countPersonBank,
                     countWorkContract,
-                    countTranscoSociety
+                    countTranscoSociety,
+                    countMutual,
+                    countChildren
                 }}
                 files={projectFile}
                 extrations={extractions}
+                templates={templates}
             />
         </Container>
     )

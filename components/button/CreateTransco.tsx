@@ -1,5 +1,5 @@
 "use client";
-import { createTranscoSociety, createTranscoEstablishment, createTranscoPerson, createTranscoWorkcontract } from "@/src/actions/transco/transco.actions";
+import { createTranscoSociety, createTranscoEstablishment, createTranscoPerson, createTranscoWorkcontract, createTranscoDomainEmail } from "@/src/actions/transco/transco.actions";
 import { Button } from "@/components/ui/button";
 import { useDebouncedCallback } from 'use-debounce';
 import { toast } from "sonner"
@@ -14,7 +14,8 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-export default function CreataTransco({ projectSlug, type, buttonLabel }: { projectSlug: string, type: 'society' | 'establishment' | 'person' | 'workcontract', buttonLabel: string }) {
+import type { TypeTransco } from "@/src/helpers/typeTransco"
+export default function CreataTransco({ projectSlug, type, buttonLabel }: { projectSlug: string, type: TypeTransco, buttonLabel: string }) {
     const handleClick = useDebouncedCallback(async () => {
         try {
             toast.info(`Début du traitement`, {
@@ -36,6 +37,9 @@ export default function CreataTransco({ projectSlug, type, buttonLabel }: { proj
                     break;
                 case "workcontract":
                     await createTranscoWorkcontract({ projectSlug, type })
+                    break;
+                case "domainEmail":
+                    await createTranscoDomainEmail({ projectSlug, type })
                     break;
                 default:
                     throw new Error('Type de transcodification inconnu')

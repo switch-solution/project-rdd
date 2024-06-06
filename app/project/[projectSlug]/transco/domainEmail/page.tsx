@@ -1,7 +1,6 @@
-import { auth } from "@/lib/auth";
-import { Project } from "@/src/class/project";
-import { notFound } from "next/navigation";
-import { Container, ContainerBreadCrumb, ContainerForm } from "@/components/container/Container";
+import { columns } from "@/app/project/[projectSlug]/transco/domainEmail/dataTablecolumns"
+import { DataTable } from "@/components/ui/dataTable";
+import { Container, ContainerBreadCrumb, ContainerDataTable } from "@/components/container/Container";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -10,10 +9,12 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { auth } from "@/lib/auth";
+import { Project } from "@/src/class/project";
 import Link from "next/link";
-import UploadFileDsn from "@/components/form/UploadDsn";
-import UploadFileTemplate from "@/components/form/UploadTemplate";
-export default async function Page({ params }: { params: { projectSlug: string, type: string } }) {
+import { notFound } from "next/navigation";
+import CreateTransco from "@/components/button/CreateTransco";
+export default async function Page({ params }: { params: { projectSlug: string } }) {
     const session = await auth()
     if (!session?.user?.id) {
         throw new Error('Vous n\'êtes pas connecté')
@@ -28,6 +29,15 @@ export default async function Page({ params }: { params: { projectSlug: string, 
     if (!authorization) {
         throw new Error('Vous n\'avez pas accès à ce projet')
     }
+    const transcoDomainEmailList = await project.getTranscoDomainEmail()
+    const transcoDomainEmail = transcoDomainEmailList.map((transco) => {
+        return {
+            projectSlug: params.projectSlug,
+            slug: transco.slug,
+            domain: transco.domain,
+            type: transco.type,
+        }
+    })
     return (
         <Container>
             <ContainerBreadCrumb>
@@ -47,20 +57,17 @@ export default async function Page({ params }: { params: { projectSlug: string, 
                         <BreadcrumbSeparator />
                         <BreadcrumbItem>
                             <BreadcrumbLink asChild>
-                                <Link href={`/project/${params.projectSlug}/upload/${params.type}`}>{params.type}</Link>
+                                <Link href={`/project/${params.projectSlug}/transco/society`}>Transodification des sociétés</Link>
                             </BreadcrumbLink>
                         </BreadcrumbItem>
                         <BreadcrumbSeparator />
                     </BreadcrumbList>
                 </Breadcrumb>
             </ContainerBreadCrumb>
-            <ContainerForm title={
-                params.type === 'bank' ? 'Importer un fichier bancaire' : 'Importer un fichier DSN'
-            }>
-                {params.type === 'bank' &&
-                    <UploadFileTemplate projectSlug={params.projectSlug} templateSlug="rib_salaries" />}
-                {params.type === 'dsn' && <UploadFileDsn projectSlug={params.projectSlug} />}
-            </ContainerForm>
+            <ContainerDataTable>
+                <CreateTransco projectSlug={params.projectSlug} type="domainEmail" buttonLabel="Générer transco des domaines" />
+                <DataTable columns={columns} data={transcoDomainEmail} inputSearch="domain" inputSearchPlaceholder="Chercher par domaine" />
+            </ContainerDataTable>
         </Container>
     )
 

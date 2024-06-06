@@ -35,7 +35,7 @@ export default async function Page({ params }: { params: { projectSlug: string, 
     if (!extractionDetail) {
         notFound()
     }
-    const { transcoSociety, transcoPerson, transcoWorkContract } = await project.getTransco()
+    const { transcoSociety, transcoPerson, transcoWorkContract, transcoPersonEmail, transcoPersonEnfant } = await project.getTransco()
     const filesList = await extraction.getFiles()
 
     const files = filesList.files.map((file) => {
@@ -49,6 +49,12 @@ export default async function Page({ params }: { params: { projectSlug: string, 
                 break
             case 'Contrat de travail':
                 idList = transcoWorkContract
+                break
+            case 'Email':
+                idList = transcoPersonEmail
+                break
+            case 'Enfant':
+                idList = transcoPersonEnfant
                 break
         }
         return {

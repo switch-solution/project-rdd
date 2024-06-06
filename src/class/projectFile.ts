@@ -60,6 +60,9 @@ export class ProjectFile {
                                             order: 'asc'
                                         }
                                     }
+                                },
+                                orderBy: {
+                                    order: 'asc'
                                 }
                             }
                         }

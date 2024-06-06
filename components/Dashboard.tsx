@@ -5,7 +5,6 @@ import {
     Upload,
     File,
     ListFilter,
-
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -26,7 +25,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
 import { Progress } from "@/components/ui/progress"
 import { Separator } from "@/components/ui/separator"
 import {
@@ -44,7 +42,7 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs"
 
-export function Dashboard({ projectSlug, count, files, extrations }: {
+export function Dashboard({ projectSlug, count, files, extrations, templates }: {
     projectSlug: string, count: {
         countDsn: number,
         countNumSS: number,
@@ -57,6 +55,8 @@ export function Dashboard({ projectSlug, count, files, extrations }: {
         countPersonBank: number,
         countWorkContract: number,
         countTranscoSociety: number,
+        countMutual: number
+        countChildren: number
 
     },
     files: {
@@ -75,10 +75,13 @@ export function Dashboard({ projectSlug, count, files, extrations }: {
         status: string,
         slug: string,
         createdAt: Date
+    }[],
+    templates: {
+        label: string,
+        slug: string
     }[]
 
 }) {
-
     return (
 
         <div className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 lg:grid-cols-3 xl:grid-cols-3">
@@ -206,22 +209,25 @@ export function Dashboard({ projectSlug, count, files, extrations }: {
                                                 <Link href={`/project/${projectSlug}/upload/dsn`}> <Upload /></Link>
                                             </TableCell>
                                         </TableRow>
-                                        <TableRow>
-                                            <TableCell>
-                                                <div className="font-medium">Banque</div>
-                                            </TableCell>
-                                            <TableCell className="hidden sm:table-cell">
-                                                DSN
-                                            </TableCell>
-                                            <TableCell className="hidden sm:table-cell">
-                                                <Badge className="text-xs" variant="secondary">
-                                                    En attente
-                                                </Badge>
-                                            </TableCell>
-                                            <TableCell className="sm:table-cell">
-                                                <Link href={`/project/${projectSlug}/upload/bank`}><Upload /></Link>
-                                            </TableCell>
-                                        </TableRow>
+                                        {templates.map(template =>
+                                            <TableRow key={template.slug}>
+                                                <TableCell>
+                                                    <div className="font-medium">{template.label}</div>
+                                                </TableCell>
+                                                <TableCell className="hidden sm:table-cell">
+                                                    Excel
+                                                </TableCell>
+                                                <TableCell className="hidden sm:table-cell">
+                                                    <Badge className="text-xs" variant="secondary">
+                                                        En attente
+                                                    </Badge>
+                                                </TableCell>
+                                                <TableCell className="sm:table-cell">
+                                                    <Link href={`/project/${projectSlug}/upload/${template.slug}`}> <Upload /></Link>
+                                                </TableCell>
+                                            </TableRow>
+
+                                        )}
                                     </TableBody>
                                 </Table>
                             </CardContent>
@@ -314,6 +320,22 @@ export function Dashboard({ projectSlug, count, files, extrations }: {
                                             </TableCell>
                                             <TableCell className="sm:table-cell">
                                                 <Link href={`/project/${projectSlug}/transco/workcontract`}> <ArrowRight /></Link>
+                                            </TableCell>
+                                        </TableRow>
+                                        <TableRow>
+                                            <TableCell>
+                                                <div className="font-medium">Domaine email</div>
+                                            </TableCell>
+                                            <TableCell className="hidden sm:table-cell">
+                                                <Badge>Obligatoire</Badge>
+                                            </TableCell>
+                                            <TableCell className="hidden sm:table-cell">
+                                                <Badge className="text-xs" variant="secondary">
+                                                    0
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="sm:table-cell">
+                                                <Link href={`/project/${projectSlug}/transco/domainEmail`}> <ArrowRight /></Link>
                                             </TableCell>
                                         </TableRow>
                                         <TableRow>
@@ -515,6 +537,14 @@ export function Dashboard({ projectSlug, count, files, extrations }: {
                             <li className="flex items-center justify-between">
                                 <span className="text-muted-foreground">Nombre de RIB salariés</span>
                                 <span>{count.countPersonBank}</span>
+                            </li>
+                            <li className="flex items-center justify-between">
+                                <span className="text-muted-foreground">Nombre d&apos;enfants</span>
+                                <span>{count.countChildren}</span>
+                            </li>
+                            <li className="flex items-center justify-between">
+                                <span className="text-muted-foreground">Nombre de contrat de prévoyance/mutuelle</span>
+                                <span>{count.countMutual}</span>
                             </li>
                         </ul>
                         <Separator className="my-2" />

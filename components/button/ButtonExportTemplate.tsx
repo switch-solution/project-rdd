@@ -9,7 +9,7 @@ export default function ButttonExportTemplate({ templateSlug, fileLabel }: { tem
     const handleClick = async () => {
         const action = await createTemplate({ templateSlug })
         if (action.serverError || !action.data) {
-            toast.error(`Oups une erreur est survenur}`, {
+            toast.error(`Oups une erreur est survenue`, {
                 description: new Date().toLocaleDateString(),
                 action: {
                     label: "fermer",

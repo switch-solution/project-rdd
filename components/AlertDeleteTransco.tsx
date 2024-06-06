@@ -12,8 +12,8 @@ import {
 import { Trash } from "lucide-react"
 import { deleteTransco } from "@/src/actions/transco/transco.actions"
 import { toast } from "sonner"
-
-export default function AlertDeleteTransco({ projectSlug, transcoSlug, type }: { projectSlug: string, transcoSlug: string, type: 'society' | 'establishment' | 'person' | 'workcontract' }) {
+import type { TypeTransco } from "@/src/helpers/typeTransco"
+export default function AlertDeleteTransco({ projectSlug, transcoSlug, type }: { projectSlug: string, transcoSlug: string, type: TypeTransco }) {
     return (
         <AlertDialog>
             <AlertDialogTrigger><Trash /></AlertDialogTrigger>

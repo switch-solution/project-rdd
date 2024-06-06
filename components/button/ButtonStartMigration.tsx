@@ -4,8 +4,8 @@ import { Factory } from "lucide-react";
 import { createTransform } from "@/src/actions/transform/transform.actions";
 import { createExtractionStat } from "@/src/actions/extraction/extraction.actions";
 import { Button } from "@/components/ui/button";
-import { useDebouncedCallback } from 'use-debounce';
 import { toast } from "sonner"
+import type { IteratorLabel } from "@/src/helpers/typeTransco";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -25,11 +25,86 @@ export default function ButtonStartMigration({ projectSlug, extractionSlug, proj
         projectFileSlug: string,
         idList: IdListSociety[] | IdListPerson[] | IdListWorkContract[]
         status: 'En attente' | 'Terminé'
-        iteratorLabel: 'Société' | 'Individu' | 'Contrat de travail'
+        iteratorLabel: IteratorLabel
     }) {
     const [loading, setLoading] = useState(false)
-    const [process, setProcess] = useState(0)
-    const handleClick = useDebouncedCallback(async () => {
+    const [progress, setProgress] = useState(0)
+    const rdd = async (id: unknown) => {
+        try {
+            switch (iteratorLabel) {
+                case 'Société':
+                    const society = id as IdListSociety
+                    await createTransform({
+                        projectSlug,
+                        projectFileSlug,
+                        extractionSlug,
+                        siren: society.siren,
+                        id: society.siren
+
+                    })
+                    break
+                case 'Individu':
+                    const person = id as IdListPerson
+                    await createTransform({
+                        projectSlug,
+                        projectFileSlug,
+                        extractionSlug,
+                        id: person.numSS,
+                        numSS: person.numSS
+
+                    })
+                    break
+                case 'Contrat de travail':
+                    const workContract = id as IdListWorkContract
+                    await createTransform({
+                        projectSlug,
+                        projectFileSlug,
+                        extractionSlug,
+                        id: workContract.numSS,
+                        numSS: workContract.numSS,
+                        contractId: workContract.contractId
+                    })
+                    break
+                case 'Email':
+                    const email = id as IdListPerson
+                    await createTransform({
+                        projectSlug,
+                        projectFileSlug,
+                        extractionSlug,
+                        id: email.numSS,
+                        numSS: email.numSS
+                    })
+                    break
+                case 'Enfant':
+                    const enfant = id as IdListPerson
+                    await createTransform({
+                        projectSlug,
+                        projectFileSlug,
+                        extractionSlug,
+                        id: enfant.numSS,
+                        numSS: enfant.numSS
+                    })
+                    break
+            }
+        } catch (err) {
+            console.error(err)
+        }
+    }
+    let completed = 0;
+
+    const trackProgress = (p: Promise<any>, total: number) => {
+        return new Promise((resolve, reject) => {
+            p.then((val) => {
+                completed++;
+                setProgress(Math.round((completed / total) * 100));
+                resolve(val);
+            })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
+    };
+    const handleClick = async () => {
         setLoading(true)
         try {
             toast.info(`Début du traitement`, {
@@ -40,48 +115,8 @@ export default function ButtonStartMigration({ projectSlug, extractionSlug, proj
                 },
             })
             const startDateProcess = new Date()
-            let increment = 0
-            for (const id of idList) {
-                switch (iteratorLabel) {
-                    case 'Société':
-                        const society = id as IdListSociety
-                        const actionSociety = await createTransform({
-                            projectSlug,
-                            projectFileSlug,
-                            extractionSlug,
-                            siren: society.siren,
-                            id: society.siren
-
-                        })
-                        break
-                    case 'Individu':
-                        const person = id as IdListPerson
-                        const actionPerson = await createTransform({
-                            projectSlug,
-                            projectFileSlug,
-                            extractionSlug,
-                            id: person.numSS,
-                            numSS: person.numSS
-
-                        })
-                        break
-                    case 'Contrat de travail':
-                        const workContract = id as IdListWorkContract
-                        const actionWorkContract = await createTransform({
-                            projectSlug,
-                            projectFileSlug,
-                            extractionSlug,
-                            id: workContract.numSS,
-                            numSS: workContract.numSS,
-                            contractId: workContract.contractId
-                        })
-                        break
-                }
-
-                setProcess(Math.round((increment / idList.length) * 100))
-                increment++
-
-            }
+            const promises = idList.map((id) => trackProgress(rdd(id), idList.length));
+            await Promise.all(promises)
             const endDateProcess = new Date()
             const action = await createExtractionStat({
                 projectSlug,
@@ -108,10 +143,11 @@ export default function ButtonStartMigration({ projectSlug, extractionSlug, proj
             console.error(err)
         }
 
-    }, 5000)
+    }
     return (
         <>
-            {loading && <span>{process}%</span>}
+            {loading && progress === 0 && <span>Préparation du traitement</span>}
+            {loading && progress > 0 && <span>{progress}%</span>}
             {!loading && status === 'En attente' &&
                 <AlertDialog>
                     <AlertDialogTrigger asChild>

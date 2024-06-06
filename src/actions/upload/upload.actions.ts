@@ -39,6 +39,19 @@ const dsnDataSchema = z.object({
         idcc: z.array(z.object({
             idcc: z.string(),
         })),
+        mutuals: z.array(z.object({
+            contractId: z.string().optional(),
+            organisme: z.string().optional(),
+            delegate: z.string().optional(),
+            covererd: z.string().optional(),
+            techId: z.string().optional(),
+
+        })),
+        mutualEmployees: z.array(z.object({
+            numSS: z.string(),
+            idTechAffiliation: z.string().optional(),
+            idTechAffiliationMutual: z.string().optional(),
+        })),
         employees: z.array(z.object({
             numSS: z.string(),
             lastname: z.string(),
@@ -105,6 +118,8 @@ export const uploadFileDsn = authorizationProject(dsnDataSchema, async (values: 
     const dsnJobs = dsnData.jobs
     const employees = dsnData.employees
     const workContracts = dsnData.workContracts
+    const mutuals = dsnData.mutuals
+    const mutualEmployees = dsnData.mutualEmployees
     try {
         const dsnId = await prisma.dsn.create({
             data: {
@@ -143,6 +158,7 @@ export const uploadFileDsn = authorizationProject(dsnDataSchema, async (values: 
             }
 
         })
+
         await prisma.dsn_Value_Exist.create({
             data: {
                 dsnId: dsnId.id,
@@ -233,6 +249,45 @@ export const uploadFileDsn = authorizationProject(dsnDataSchema, async (values: 
             data: jobs
         })
 
+        //Add mutual
+        await prisma.mutual.createMany({
+            data: mutuals.map((mutual) => {
+                return {
+                    contractId: mutual.contractId ? mutual.contractId : "",
+                    organisme: mutual.organisme ? mutual.organisme : "",
+                    delegate: mutual.delegate ? mutual.delegate : "",
+                    covererd: mutual.covererd ? mutual.covererd : "",
+                    techId: mutual.techId ? mutual.techId : "",
+                    siren: dsnSociety.siren,
+                    projectId: projectId,
+                    dsnId: dsnId.id
+                }
+            })
+        })
+        //Add mutual employees
+        const mutualsEmployeeList = []
+        for (const mutualEmployee of mutualEmployees) {
+            let mutualExist = mutuals.find((mutual) => mutual.techId === mutualEmployee.idTechAffiliationMutual)
+            if (mutualExist) {
+                mutualsEmployeeList.push({
+                    ...mutualEmployee,
+                    ...mutualExist
+                })
+            }
+
+        }
+        await prisma.person_Mutual.createMany({
+            data: mutualsEmployeeList.map((mutualEmployee) => {
+                return {
+                    numSS: mutualEmployee.numSS,
+                    organisme: mutualEmployee.organisme ? mutualEmployee.organisme : "",
+                    contractId: mutualEmployee.contractId ? mutualEmployee.contractId : "",
+                    projectId: projectId,
+                    dsnId: dsnId.id,
+                    siren: dsnSociety.siren
+                }
+            })
+        })
     } catch (err: unknown) {
         //Delete all datas
         await prisma.dsn.deleteMany({

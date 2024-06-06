@@ -122,6 +122,11 @@ model Project {
     Extraction_File       Extraction_File[]
     Extraction_Stat       Extraction_Stat[]
     Person_Bank           Person_Bank[]
+    Person_Children       Person_Children[]
+    Person_Free_Zone      Person_Analytic[]
+    Transco_Domain_Email  Transco_Domain_Email[]
+    Mutual                Mutual[]
+    Person_Mutual         Person_Mutual[]
 }
 
 model Software {
@@ -151,9 +156,9 @@ model Iterator {
 model Iterator_Standard_Field {
     iteratorLabel String
     typeValue     String
-    Iterator      Iterator       @relation(fields: [iteratorLabel], references: [label])
+    Iterator      Iterator       @relation(fields: [iteratorLabel], references: [label], onDelete: Cascade)
     fieldLabel    String
-    Field         Standard_Field @relation(fields: [fieldLabel], references: [label])
+    Field         Standard_Field @relation(fields: [fieldLabel], references: [label], onDelete: Cascade)
     createdAt     DateTime       @default(now())
     updatedAt     DateTime       @updatedAt
     createdBy     String         @default("system")
@@ -360,6 +365,8 @@ model Dsn {
     WorkContract    WorkContract[]
     Establishment   Establishment[]
     Dsn_Value_Exist Dsn_Value_Exist[]
+    Mutual          Mutual[]
+    Person_Mutual   Person_Mutual[]
 }
 
 model Society {
@@ -375,6 +382,7 @@ model Society {
     createdAt      DateTime        @default(now())
     updatedAt      DateTime        @updatedAt
     createdBy      String
+    Mutual         Mutual[]
 
     @@id([dsnId, siren])
 }
@@ -434,9 +442,9 @@ model Person {
     dsnId         String
     siren         String
     nic           String
-    DSN           Dsn            @relation(fields: [dsnId], references: [id], onDelete: Cascade)
-    Project       Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
-    Establishment Establishment  @relation(fields: [dsnId, siren, nic], references: [dsnId, siren, nic], onDelete: Cascade)
+    DSN           Dsn             @relation(fields: [dsnId], references: [id], onDelete: Cascade)
+    Project       Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    Establishment Establishment   @relation(fields: [dsnId, siren, nic], references: [dsnId, siren, nic], onDelete: Cascade)
     numSS         String
     lastname      String
     surname       String
@@ -447,23 +455,116 @@ model Person {
     address1      String
     codeZip       String
     city          String
-    country       String         @default("FR")
+    country       String          @default("FR")
     codeZipBith   String
     countryBirth  String
     address2      String?
     address3      String?
     email         String?
-    employeeId    String         @default("Pas de matricule")
+    employeeId    String          @default("Pas de matricule")
     graduate      String?
     studies       String?
     date          String?
     ntt           String?
-    updatedAt     DateTime       @updatedAt
-    createdAt     DateTime       @default(now())
+    updatedAt     DateTime        @updatedAt
+    createdAt     DateTime        @default(now())
     createdBy     String
     WorkContract  WorkContract[]
+    Person_Mutual Person_Mutual[]
 
     @@id([dsnId, numSS])
+}
+
+model Person_Children {
+    numSS     String
+    projectId String
+    Project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    lastname  String
+    firstname String
+    birthday  DateTime
+    sex       String
+    order     Int
+    updatedAt DateTime @updatedAt
+    createdAt DateTime @default(now())
+    createdBy String
+
+    @@id([projectId, numSS, order])
+}
+
+model Transco_Domain_Email {
+    projectId String
+    Project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    domain    String
+    type      String
+    updatedAt DateTime @updatedAt
+    createdAt DateTime @default(now())
+    createdBy String
+    slug      String   @unique @default(cuid())
+
+    @@id([projectId, domain])
+}
+
+model Person_Analytic {
+    projectId  String
+    Project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    numSS      String
+    siren      String
+    axis       String
+    section    String
+    order      Int
+    percentage Float
+    updatedAt  DateTime @updatedAt
+    createdAt  DateTime @default(now())
+    createdBy  String
+
+    @@id([projectId, numSS, axis, section])
+    @@unique([projectId, numSS, axis, order])
+}
+
+model Mutual {
+    dsnId         String
+    DSN           Dsn             @relation(fields: [dsnId], references: [id], onDelete: Cascade)
+    projectId     String
+    Society       Society         @relation(fields: [dsnId, siren], references: [dsnId, siren], onDelete: Cascade)
+    Project       Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    contractId    String
+    organisme     String
+    siren         String
+    delegate      String?
+    covererd      String?
+    techId        String?
+    updatedAt     DateTime        @updatedAt
+    createdAt     DateTime        @default(now())
+    createdBy     String          @default("system")
+    Person_Mutual Person_Mutual[]
+
+    @@id([projectId, dsnId, siren, contractId])
+}
+
+model Person_Mutual {
+    dsnId        String
+    DSN          Dsn      @relation(fields: [dsnId], references: [id], onDelete: Cascade)
+    projectId    String
+    Project      Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    numSS        String
+    Person       Person   @relation(fields: [dsnId, numSS], references: [dsnId, numSS], onDelete: Cascade)
+    contractId   String
+    organisme    String
+    siren        String
+    delegate     String?
+    techId       String?
+    option       String?
+    pop          String?
+    children     String?
+    assign       String?
+    numberAssign String?
+    otheAssign   String?
+    Mutual       Mutual   @relation(fields: [projectId, dsnId, siren, contractId], references: [projectId, dsnId, siren, contractId], onDelete: Cascade)
+    updatedAt    DateTime @updatedAt
+    createdAt    DateTime @default(now())
+    createdBy    String   @default("system")
+
+    @@id([projectId, dsnId, siren, numSS, contractId])
 }
 
 model Person_Bank {
@@ -779,8 +880,8 @@ model Template_Column {
     description   String
     order         Int
     slug          String   @unique
-    minLength     Int
-    maxLength     Int
+    minLength     Int?
+    maxLength     Int?
     type          String?
     format        String?
     Format        Format?  @relation(fields: [type, format], references: [type, format])

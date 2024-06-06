@@ -4,11 +4,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner"
-import { Progress } from "@/components/ui/progress";
 import XLSX from "xlsx";
-import { createTemplatePersonBank } from "@/src/actions/template/template.actions";
+import { createTemplateChildren, createTemplatePersonBank } from "@/src/actions/template/template.actions";
 
-export default function UploadFileTemplate({ projectSlug, templateSlug }: { projectSlug: string, templateSlug: 'rib_salaries' }) {
+export default function UploadFileTemplate({ projectSlug, templateSlug }: { projectSlug: string, templateSlug: 'rib_salaries' | 'enfants' }) {
     const [loading, setLoading] = useState(false)
 
     const readExcelFile = (file: File): Promise<XLSX.WorkBook> => {
@@ -58,20 +57,40 @@ export default function UploadFileTemplate({ projectSlug, templateSlug }: { proj
                 }
             }
 
-            const actions = await createTemplatePersonBank({
-                projectSlug: projectSlug,
-                templateSlug: templateSlug,
-                datas: rows as { [key: string]: string | undefined }[]
-            });
-            if (actions?.serverError) {
-                toast.error(`${actions.serverError}`, {
-                    description: new Date().toLocaleDateString(),
-                    action: {
-                        label: "fermer",
-                        onClick: () => console.log("fermeture"),
-                    },
+            if (templateSlug === 'rib_salaries') {
+                const actions = await createTemplatePersonBank({
+                    projectSlug: projectSlug,
+                    templateSlug: templateSlug,
+                    datas: rows as { [key: string]: string | undefined }[]
                 });
+                if (actions?.serverError) {
+                    toast.error(`${actions.serverError}`, {
+                        description: new Date().toLocaleDateString(),
+                        action: {
+                            label: "fermer",
+                            onClick: () => console.log("fermeture"),
+                        },
+                    });
+                }
             }
+            if (templateSlug === 'enfants') {
+                const actions = await createTemplateChildren({
+                    projectSlug: projectSlug,
+                    templateSlug: templateSlug,
+                    datas: rows as { [key: string]: string | undefined }[]
+                });
+                if (actions?.serverError) {
+                    toast.error(`${actions.serverError}`, {
+                        description: new Date().toLocaleDateString(),
+                        action: {
+                            label: "fermer",
+                            onClick: () => console.log("fermeture"),
+                        },
+                    });
+                }
+            }
+
+
 
         } catch (err) {
             setLoading(false);

@@ -2,7 +2,7 @@ import { z } from "zod"
 
 export const TranscoGenerateSchema = z.object({
     projectSlug: z.string({ required_error: "Le projet est obligatoire." }),
-    type: z.enum(["society", "establishment", "person", "workcontract"], { required_error: "Le type est obligatoire" })
+    type: z.enum(["society", "establishment", "person", "workcontract", "domainEmail"], { required_error: "Le type est obligatoire" })
 })
 
 export const TemplateCreateSchema = z.object({
@@ -13,14 +13,14 @@ export const TranscoEditSchema = z.object({
     projectSlug: z.string({ required_error: "Le projet est obligatoire." }),
     transcoSlug: z.string({ required_error: "Le slug est obligatoire." }),
     newId: z.string({ required_error: "La nouvelle valeur est obligatoire" }),
-    type: z.enum(["society", "establishment", "person", "workcontract"], { required_error: "Le type est obligatoire" })
+    type: z.enum(["society", "establishment", "person", "workcontract", "domainEmail"], { required_error: "Le type est obligatoire" })
 
 })
 
 export const TranscoDeleteSchema = z.object({
     projectSlug: z.string({ required_error: "Le projet est obligatoire." }),
     transcoSlug: z.string({ required_error: "Le slug est obligatoire." }),
-    type: z.enum(["society", "establishment", "person", "workcontract"], { required_error: "Le type est obligatoire" })
+    type: z.enum(["society", "establishment", "person", "workcontract", "domainEmail"], { required_error: "Le type est obligatoire" })
 
 })
 
@@ -91,6 +91,23 @@ export const TemplatePersonBankCreateSchema = z.object({
             "Banque 2": z.string().optional(),
             "Rib salaire": z.string().optional(),
             "Rib acompte": z.string().optional(),
+        })
+    ).optional()
+
+})
+
+export const TemplateChildrenCreateSchema = z.object({
+    projectSlug: z.string({ required_error: "Le projet est obligatoire." }),
+    templateSlug: z.enum(["enfants"]),
+    datas: z.array(
+        z.object({
+            "Numéro de sécurité sociale du salarié": z.string().optional(),
+            "Nom de lenfant": z.string().optional(),
+            "Prénom de lenfant": z.string().optional(),
+            "Date anniversaire de lenfant": z.coerce.number().int().optional(),
+            "Sexe de l'enfant": z.string().optional(),
+            "Numéro d'ordre de l'enfant": z.coerce.number().int().optional(),
+
         })
     ).optional()
 

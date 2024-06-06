@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma"
-import type { ITransform, Person, WorkContract } from "@/src/class/transform/iTransform"
+import type { ITransform, PersonEmail } from "@/src/class/transform/iTransform"
 import { Transform } from "@/src/class/transform/transform";
 import type { IteratorLabel } from "@/src/helpers/typeTransco";
-export class TransformWorkContract extends Transform implements ITransform {
+export class TransformEmail extends Transform implements ITransform {
     projectId: string;
     extractionLabel: string;
     userId: string;
@@ -24,43 +24,18 @@ export class TransformWorkContract extends Transform implements ITransform {
 
     }
     data = async ({ numSS, contractId, siren }: { numSS?: string, contractId?: string, siren?: string }) => {
-        if (!numSS || !contractId) {
-            throw new Error("Le numéro SS et le contrat Id sont obligatoires")
+        if (!numSS) {
+            throw new Error("Le siren est obligatoire")
         }
         const lastDsn = await this.lastDsn(numSS)
-        const workContract = await prisma.workContract.findFirstOrThrow({
+        const person = await prisma.person.findFirstOrThrow({
             where: {
                 numSS,
-                contractId,
-                dsnId: lastDsn.dsnId
+                dsnId: lastDsn.dsnId,
             },
             select: {
-                dsnId: true,
                 numSS: true,
                 siren: true,
-                nic: true,
-                startDate: true,
-                contractEndDate: true,
-                status: true,
-                pcs: true,
-                pcsBis: true,
-                mal: true,
-                contractId: true,
-                contract: true,
-                ss: true,
-                idcc: true,
-
-            }
-        })
-
-        const transcoWorkContract = await prisma.transco_WorkContract.findFirstOrThrow({
-            where: {
-                numSS,
-                contractId: workContract.contractId,
-                projectId: this.projectId
-            },
-            select: {
-                transcoContractNewId: true
             }
         })
         const transcoPerson = await prisma.transco_Person.findFirstOrThrow({
@@ -72,21 +47,50 @@ export class TransformWorkContract extends Transform implements ITransform {
                 transcoEmployeeNewId: true
             }
         })
-        return {
-            ...workContract,
-            ...transcoWorkContract,
-            ...transcoPerson
 
+        const emailPerson = await prisma.person.findFirst({
+            where: {
+                numSS,
+                dsnId: lastDsn.dsnId,
+            },
+            select: {
+                email: true
+            }
+        })
+        const transcoEmail = await prisma.transco_Domain_Email.findMany({
+            where: {
+                projectId: this.projectId,
+            }
+        })
+        const transcoSocietyNewId = await prisma.transco_Society.findFirst({
+            where: {
+                projectId: this.projectId,
+                siren: person?.siren
+            },
+            select: {
+                transcoSocietyNewId: true
+            }
+        })
+        const emailPersonDomain = emailPerson?.email?.split('@')[1]
+        const emailDomain = transcoEmail.find(e => e.domain === emailPersonDomain)
+        const emailPerso = emailDomain?.type === 'personnel' ? emailPerson?.email : ''
+        const emailPro = emailDomain?.type === 'professionnel' ? emailPerson?.email : ''
+        return {
+            ...person,
+            ...transcoPerson,
+            emailPerso: emailPerso ? emailPerso : null,
+            emailPro: emailPro ? emailPro : null,
+            transcoSocietyNewId: transcoSocietyNewId?.transcoSocietyNewId ? transcoSocietyNewId.transcoSocietyNewId : null
         }
     }
 
     transform = async () => {
         try {
 
-            if (!this.numSS || !this.contractId) {
-                throw new Error("Le num SS est obligatoire et le contrat Id est obligatoire")
+            if (!this.numSS) {
+                throw new Error("Le num SS est obligatoire")
             }
-            const datas = await this.data({ numSS: this.numSS, contractId: this.contractId }) as WorkContract
+            const datas = await this.data({ numSS: this.numSS }) as PersonEmail
             if (!datas) {
                 throw new Error("Le num SS n'a pas été trouvé")
             }
@@ -105,11 +109,11 @@ export class TransformWorkContract extends Transform implements ITransform {
 
     standardField = async (iterator: IteratorLabel) => {
         try {
-            if (iterator !== "Contrat de travail") {
-                throw new Error("L'itérateur doit être 'individu'")
+            if (iterator !== "Email") {
+                throw new Error("L'itérateur doit être 'email'")
             }
-            const standardFieldWorkContract = await this.loadStandardField('Contrat de travail')
-            return standardFieldWorkContract
+            const standardFieldSociety = await this.loadStandardField('Email')
+            return standardFieldSociety
         } catch (err: unknown) {
             console.error(err)
             throw new Error(err as string)

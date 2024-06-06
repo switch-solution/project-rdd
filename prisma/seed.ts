@@ -9,6 +9,11 @@ import { templateV0001 } from './seed/7_template.v0001.seed';
 import { filev0003 } from './seed/8_file.v0003.seed';
 import { filev0004 } from './seed/9_file.v0004.seed';
 import { filev0005 } from './seed/10_file.v0005.seed';
+import { templateV0002 } from './seed/11_template.v0002.seed';
+import { iteratorV0003 } from './seed/12_iterator.v0003.seed';
+import { filev0006 } from './seed/13_file.v0006.seed';
+import { iteratorV0004 } from './seed/14_iterator.v0004.seed';
+import { filev0007 } from './seed/15_file.v0007.seed';
 const prisma = new PrismaClient(
     {
         log: [
@@ -115,6 +120,51 @@ const main = async () => {
             process.exit(1)
         })
     await filev0005.run()
+        .then(async () => {
+            await prisma.$disconnect()
+        })
+        .catch(async (e) => {
+            console.error(e)
+            await prisma.$disconnect()
+            process.exit(1)
+        })
+    await templateV0002.run()
+        .then(async () => {
+            await prisma.$disconnect()
+        })
+        .catch(async (e) => {
+            console.error(e)
+            await prisma.$disconnect()
+            process.exit(1)
+        })
+    await iteratorV0003.run()
+        .then(async () => {
+            await prisma.$disconnect()
+        })
+        .catch(async (e) => {
+            console.error(e)
+            await prisma.$disconnect()
+            process.exit(1)
+        })
+    await filev0006.run()
+        .then(async () => {
+            await prisma.$disconnect()
+        })
+        .catch(async (e) => {
+            console.error(e)
+            await prisma.$disconnect()
+            process.exit(1)
+        })
+    await iteratorV0004.run()
+        .then(async () => {
+            await prisma.$disconnect()
+        })
+        .catch(async (e) => {
+            console.error(e)
+            await prisma.$disconnect()
+            process.exit(1)
+        })
+    await filev0007.run()
         .then(async () => {
             await prisma.$disconnect()
         })

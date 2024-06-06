@@ -1,1 +1,2 @@
-export type TypeTransco = 'society' | 'establishment' | 'person' | 'workcontract'
+export type TypeTransco = 'society' | 'establishment' | 'person' | 'workcontract' | 'domainEmail'
+export type IteratorLabel = 'Société' | 'Établissement' | 'Individu' | 'Contrat de travail' | 'Email' | 'Enfant'

@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 export type File = {
     fileSlug: string
+    standardFieldLabel: string | null,
     slug: string
     softwareLabel: string
     description: string | null
@@ -24,8 +25,8 @@ export const columns: ColumnDef<File>[] = [
         header: "description",
     },
     {
-        accessorKey: "fileFormat",
-        header: "Format de fichier",
+        accessorKey: "standardFieldLabel",
+        header: "Champ standard",
     },
     {
         accessorKey: "type",

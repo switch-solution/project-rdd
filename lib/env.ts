@@ -11,6 +11,8 @@ export const env = createEnv({
         NODE_ENV: z.enum(["development", "production"]),
         EMAIL_SERVER: z.string().optional(),
         EMAIL_FROM: z.string().optional(),
+        API_ROOT: z.string().optional(),
+        DOMAIN: z.string()
 
     },
     client: {
@@ -25,6 +27,8 @@ export const env = createEnv({
         NODE_ENV: process.env.NODE_ENV,
         EMAIL_SERVER: process.env.EMAIL_SERVER,
         EMAIL_FROM: process.env.EMAIL_FROM,
+        API_ROOT: process.env.API_ROOT,
+        DOMAIN: process.env.DOMAIN
     },
     // For Next.js >= 13.4.4, you only need to destructure client variables:
     // experimental__runtimeEnv: {

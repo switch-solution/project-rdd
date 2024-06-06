@@ -8,7 +8,7 @@ import { toast } from "sonner"
 import { uploadFileDsn } from "@/src/actions/upload/upload.actions";
 import { Progress } from "@/components/ui/progress";
 import { useRouter } from 'next/navigation'
-import { DsnObject, EmployeeObject, EstablishmentObject, IdccObject, JobObject, SocietyObject, WorkContractObject } from "@fibre44/dsn-parser/lib/utils/type";
+import { DsnObject, EmployeeObject, EstablishmentObject, IdccObject, JobObject, SocietyObject, WorkContractObject, MutualObject, MutualEmployeeObject } from "@fibre44/dsn-parser/lib/utils/type";
 type Dsn = {
     dsnId: string,
     dsnRows: {
@@ -28,6 +28,8 @@ type ExtractionDsn = {
     idcc: IdccObject[],
     employees: EmployeeObject[]
     workContracts: WorkContractObject[]
+    mutuals: MutualObject[]
+    mutualEmployees: MutualEmployeeObject[]
 
 }
 
@@ -75,9 +77,7 @@ export default function UploadFileDsn({ projectSlug }: { projectSlug: string }) 
         setLoading(true)
         const dsn = (e.target as HTMLFormElement).elements[0] as HTMLInputElement
         const files = dsn.files ? Array.from(dsn.files) : []
-
         for (let file of files) {
-
             const random = Math.random().toString(36).substring(7)
             const dsnRows = await parseFile(file, random) as { id: string, value: string }[]
             addDSnData.push({ dsnId: random, dsnRows: dsnRows })
@@ -89,7 +89,6 @@ export default function UploadFileDsn({ projectSlug }: { projectSlug: string }) 
             for (const dsn of addDSnData) {
                 progressIncrement = progressIncrement + 1
                 setProgress(() => progressIncrement / totalFiles * 100)
-                console.log(progress)
                 const extraction = await extractionData(dsn)
                 const action = await uploadFileDsn({
                     projectSlug: projectSlug,
@@ -137,7 +136,8 @@ export default function UploadFileDsn({ projectSlug }: { projectSlug: string }) 
         const idcc = parser.idcc
         const employees = parser.employees
         const workContracts = parser.workContracts
-
+        const mutuals = parser.mutual
+        const mutualEmployees = parser.mutualEmployee
         return {
             dsnId: dsnId,
             dsn: dsnDetail,
@@ -146,7 +146,9 @@ export default function UploadFileDsn({ projectSlug }: { projectSlug: string }) 
             jobs: jobs,
             idcc: idcc,
             employees: employees,
-            workContracts: workContracts
+            workContracts: workContracts,
+            mutuals: mutuals,
+            mutualEmployees: mutualEmployees
         }
     }
 
