@@ -1,7 +1,7 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Rows2 } from "lucide-react"
 import Link from "next/link"
 export type File = {
     fileSlug: string
@@ -29,8 +29,14 @@ export const columns: ColumnDef<File>[] = [
         header: "Champ standard",
     },
     {
-        accessorKey: "type",
-        header: "Type",
+        id: "row",
+        header: "Lignes",
+        cell: ({ row }) => {
+            const column = row.original
+            return (
+                <Link href={`/file/${column.fileSlug}/columns/${column.slug}/row`}><Rows2 /></Link>
+            )
+        },
     },
 
     {

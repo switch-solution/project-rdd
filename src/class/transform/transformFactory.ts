@@ -3,6 +3,7 @@ import { TransformPerson } from "@/src/class/transform/transformPerson";
 import { TransformWorkContract } from "@/src/class/transform/transformWorkContract";
 import { TransformEmail } from "@/src/class/transform/transformEmail"
 import { TransformChildren } from "@/src/class/transform/transformChildren";
+import { TransformEstablishment } from "@/src/class/transform/transformEstablishment";
 import type { IteratorLabel } from "@/src/helpers/typeTransco";
 export class TransformFactory {
     static createTransform(
@@ -14,7 +15,9 @@ export class TransformFactory {
             fileLabel,
             numSS,
             contractId,
-            siren
+            siren,
+            nic,
+            dsnId
         }: {
             iteratorLabel: IteratorLabel
             projectId: string;
@@ -24,6 +27,8 @@ export class TransformFactory {
             numSS?: string;
             contractId?: string;
             siren?: string;
+            nic?: string;
+            dsnId: string
         }) {
         switch (iteratorLabel) {
             case "Société":
@@ -35,7 +40,8 @@ export class TransformFactory {
                     numSS,
                     contractId,
                     siren,
-                    iteratorLabel
+                    iteratorLabel,
+                    dsnId
                 })
                 break
 
@@ -48,7 +54,8 @@ export class TransformFactory {
                     numSS,
                     contractId,
                     siren,
-                    iteratorLabel
+                    iteratorLabel,
+                    dsnId
                 })
                 break
             case "Contrat de travail":
@@ -60,7 +67,8 @@ export class TransformFactory {
                     numSS,
                     contractId,
                     siren,
-                    iteratorLabel
+                    iteratorLabel,
+                    dsnId
                 })
                 break
             case "Email":
@@ -72,7 +80,8 @@ export class TransformFactory {
                     numSS,
                     contractId,
                     siren,
-                    iteratorLabel
+                    iteratorLabel,
+                    dsnId
                 })
                 break
             case "Enfant":
@@ -84,7 +93,22 @@ export class TransformFactory {
                     numSS,
                     contractId,
                     siren,
-                    iteratorLabel
+                    iteratorLabel,
+                    dsnId
+                })
+                break
+            case "Etablissement":
+                return new TransformEstablishment({
+                    projectId,
+                    extractionLabel,
+                    userId,
+                    fileLabel,
+                    numSS,
+                    contractId,
+                    siren,
+                    iteratorLabel,
+                    nic,
+                    dsnId
                 })
                 break
             default:

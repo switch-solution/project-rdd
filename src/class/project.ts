@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { Logger } from "@/src/class/logger";
-import type { IdListSociety, IdListPerson, IdListWorkContract } from "../helpers/type";
+import type { IdListSociety, IdListPerson, IdListWorkContract, IdListEstablishment } from "../helpers/type";
 export class Project extends Logger {
     slug: string;
     constructor(slug: string) {
@@ -146,13 +146,6 @@ export class Project extends Logger {
                     siren: true
                 }
             }) as unknown as IdListSociety[]
-            const transcoEstablishment = await prisma.transco_Establishment.findMany({
-                where: {
-                    Project: {
-                        slug: this.slug
-                    }
-                }
-            })
             const transcoPerson = await prisma.transco_Person.findMany({
                 where: {
                     Project: {
@@ -197,6 +190,17 @@ export class Project extends Logger {
                     numSS: true
                 }
             })
+            const transcoEstablishment = await prisma.transco_Establishment.findMany({
+                where: {
+                    Project: {
+                        slug: this.slug
+                    },
+                },
+                select: {
+                    siren: true,
+                    nic: true
+                }
+            }) as unknown as IdListEstablishment[]
             return {
                 transcoSociety,
                 transcoEstablishment,

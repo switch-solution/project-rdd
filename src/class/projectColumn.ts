@@ -93,6 +93,22 @@ export class ProjectColumn {
         }
     }
 
+    getTranscoding = async () => {
+        try {
+            const transcoding = await prisma.project_Column_Transco_Value.findMany({
+                where: {
+                    Project_Column: {
+                        slug: this.projectColumnSlug
+                    }
+                }
+            })
+            return transcoding
+        } catch (err) {
+            console.error(err)
+            throw new Error("Impossible de récupérer les données de transcodification")
+        }
+    }
+
 
 
 }

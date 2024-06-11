@@ -1,9 +1,9 @@
 import { prisma } from "@/lib/prisma"
-import type { ITransform, Society } from "@/src/class/transform/iTransform"
+import type { ITransform, Establishment } from "@/src/class/transform/iTransform"
 import { Transform } from "@/src/class/transform/transform";
 import type { IteratorLabel } from "@/src/helpers/typeTransco";
 
-export class TransformSociety extends Transform implements ITransform {
+export class TransformEstablishment extends Transform implements ITransform {
     projectId: string;
     extractionLabel: string;
     userId: string;
@@ -12,8 +12,9 @@ export class TransformSociety extends Transform implements ITransform {
     contractId?: string;
     siren?: string;
     iteratorLabel: IteratorLabel;
+    nic?: string;
     dsnId: string;
-    constructor(props: { projectId: string; extractionLabel: string; userId: string; fileLabel: string; numSS?: string; contractId?: string; siren?: string; iteratorLabel: IteratorLabel, dsnId: string }) {
+    constructor(props: { projectId: string; extractionLabel: string; userId: string; fileLabel: string; numSS?: string; contractId?: string; siren?: string; nic?: string, iteratorLabel: IteratorLabel, dsnId: string }) {
         super(props)
         this.projectId = props.projectId
         this.extractionLabel = props.extractionLabel
@@ -23,39 +24,44 @@ export class TransformSociety extends Transform implements ITransform {
         this.contractId = props.contractId
         this.siren = props.siren
         this.iteratorLabel = props.iteratorLabel
+        this.nic = props.nic
         this.dsnId = props.dsnId
 
     }
-    data = async ({ numSS, contractId, siren }: { numSS?: string, contractId?: string, siren?: string }) => {
-        if (!siren) {
-            throw new Error("Le siren est obligatoire")
+    data = async ({ numSS, contractId, siren, nic }: { numSS?: string, contractId?: string, siren?: string, nic?: string }) => {
+        if (!siren || !nic) {
+            throw new Error("Le siren et le nic sont obligatoires")
         }
 
-        const society = await prisma.society.findFirstOrThrow({
+        const establishment = await prisma.establishment.findFirstOrThrow({
             where: {
                 siren,
                 dsnId: this.dsnId,
+                nic
             },
             select: {
                 dsnId: true,
                 siren: true,
-                apen: true,
-                zipCode: true,
+                ape: true,
+                postalCode: true,
                 city: true,
+                nic: true,
+                legalStatus: true
             }
         })
-        const transcoSociety = await prisma.transco_Society.findFirstOrThrow({
+        const transcoEstablishment = await prisma.transco_Establishment.findFirstOrThrow({
             where: {
                 siren,
+                nic,
                 projectId: this.projectId
             },
             select: {
-                transcoSocietyNewId: true
+                transcoEstablishmentNewId: true
             }
         })
         return {
-            ...society,
-            ...transcoSociety
+            ...establishment,
+            ...transcoEstablishment
 
 
         }
@@ -64,12 +70,12 @@ export class TransformSociety extends Transform implements ITransform {
     transform = async () => {
         try {
 
-            if (!this.siren) {
-                throw new Error("Le siren est obligatoire")
+            if (!this.siren || !this.nic) {
+                throw new Error("Le siren et le siren sont obligatoires")
             }
-            const datas = await this.data({ siren: this.siren }) as Society
+            const datas = await this.data({ siren: this.siren, nic: this.nic }) as Establishment
             if (!datas) {
-                throw new Error("La société n'a pas été trouvé")
+                throw new Error("L\'établissement n'a pas été trouvé")
             }
             const columns = await this.columns()
             if (!columns) {
@@ -87,8 +93,8 @@ export class TransformSociety extends Transform implements ITransform {
 
     standardField = async (iterator: IteratorLabel) => {
         try {
-            if (iterator !== "Société") {
-                throw new Error("L'itérateur doit être 'Société'")
+            if (iterator !== "Etablissement") {
+                throw new Error("L'itérateur doit être etablissement'")
             }
             const standardFieldSociety = await this.loadStandardField(iterator)
             return standardFieldSociety

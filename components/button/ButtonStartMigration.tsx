@@ -17,7 +17,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import type { IdListPerson, IdListSociety, IdListWorkContract } from "@/src/helpers/type";
+import type { IdListEstablishment, IdListPerson, IdListSociety, IdListWorkContract } from "@/src/helpers/type";
 export default function ButtonStartMigration({ projectSlug, extractionSlug, projectFileSlug, idList, status, iteratorLabel }:
     {
         projectSlug: string,
@@ -83,6 +83,18 @@ export default function ButtonStartMigration({ projectSlug, extractionSlug, proj
                         extractionSlug,
                         id: enfant.numSS,
                         numSS: enfant.numSS
+                    })
+                    break
+                case 'Etablissement':
+                    const establishment = id as IdListEstablishment
+                    await createTransform({
+                        projectSlug,
+                        projectFileSlug,
+                        extractionSlug,
+                        siren: establishment.siren,
+                        id: establishment.siren,
+                        nic: establishment.nic
+
                     })
                     break
             }

@@ -11,7 +11,8 @@ export class TransformPerson extends Transform implements ITransform {
     contractId?: string;
     siren?: string;
     iteratorLabel: IteratorLabel;
-    constructor(props: { projectId: string; extractionLabel: string; userId: string; fileLabel: string; numSS?: string; contractId?: string; siren?: string; iteratorLabel: IteratorLabel }) {
+    dsnId: string;
+    constructor(props: { projectId: string; extractionLabel: string; userId: string; fileLabel: string; numSS?: string; contractId?: string; siren?: string; iteratorLabel: IteratorLabel, dsnId: string }) {
         super(props)
         this.projectId = props.projectId
         this.extractionLabel = props.extractionLabel
@@ -21,17 +22,17 @@ export class TransformPerson extends Transform implements ITransform {
         this.contractId = props.contractId
         this.siren = props.siren
         this.iteratorLabel = props.iteratorLabel
+        this.dsnId = props.dsnId
 
     }
     data = async ({ numSS, contractId, siren }: { numSS?: string, contractId?: string, siren?: string }) => {
         if (!numSS) {
             throw new Error("Le siren est obligatoire")
         }
-        const lastDsn = await this.lastDsn(numSS)
         const person = await prisma.person.findFirstOrThrow({
             where: {
                 numSS,
-                dsnId: lastDsn.dsnId
+                dsnId: this.dsnId
             },
             select: {
                 dsnId: true,
@@ -131,7 +132,7 @@ export class TransformPerson extends Transform implements ITransform {
             if (iterator !== "Individu") {
                 throw new Error("L'itérateur doit être 'individu'")
             }
-            const standardFieldSociety = await this.loadStandardField('Individu')
+            const standardFieldSociety = await this.loadStandardField(iterator)
             return standardFieldSociety
         } catch (err: unknown) {
             console.error(err)

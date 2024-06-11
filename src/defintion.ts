@@ -73,7 +73,16 @@ export const TranformCreateSchema = z.object({
     id: z.string({ required_error: "L'id est obligatoire." }),
     numSS: z.string().optional(),
     siren: z.string().optional(),
+    nic: z.string().optional(),
     contractId: z.string().optional()
+})
+
+export const TranscodingCreateSchema = z.object({
+    projectSlug: z.string({ required_error: "Le projet est obligatoire." }),
+    fileSlug: z.string({ required_error: "Le fichier est obligatoire." }),
+    columnSlug: z.string({ required_error: "La colonne est obligatoire." }),
+    sourceValue: z.string({ required_error: "La valeur source est obligatoire." }),
+    targetValue: z.string({ required_error: "La valeur cible est obligatoire." }),
 })
 
 export const TemplatePersonBankCreateSchema = z.object({

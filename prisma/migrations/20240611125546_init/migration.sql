@@ -179,6 +179,22 @@ CREATE TABLE "Project_File" (
 );
 
 -- CreateTable
+CREATE TABLE "Column_Transco_Value" (
+    "sourceValue" TEXT NOT NULL,
+    "targetValue" TEXT NOT NULL,
+    "fileLabel" TEXT NOT NULL,
+    "softwareLabel" TEXT NOT NULL,
+    "columnLabel" TEXT NOT NULL,
+    "order" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdBy" TEXT NOT NULL DEFAULT 'system',
+    "slug" TEXT NOT NULL,
+
+    CONSTRAINT "Column_Transco_Value_pkey" PRIMARY KEY ("softwareLabel","fileLabel","columnLabel","sourceValue")
+);
+
+-- CreateTable
 CREATE TABLE "Column" (
     "fileLabel" TEXT NOT NULL,
     "softwareLabel" TEXT NOT NULL,
@@ -227,6 +243,22 @@ CREATE TABLE "Project_Column" (
     "slug" TEXT NOT NULL,
 
     CONSTRAINT "Project_Column_pkey" PRIMARY KEY ("projectId","softwareLabel","fileLabel","columnLabel")
+);
+
+-- CreateTable
+CREATE TABLE "Project_Column_Transco_Value" (
+    "projectId" TEXT NOT NULL,
+    "sourceValue" TEXT NOT NULL,
+    "targetValue" TEXT NOT NULL,
+    "softwareLabel" TEXT NOT NULL,
+    "columnLabel" TEXT NOT NULL,
+    "fileLabel" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "createdBy" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
+
+    CONSTRAINT "Project_Column_Transco_Value_pkey" PRIMARY KEY ("projectId","fileLabel","columnLabel","sourceValue")
 );
 
 -- CreateTable
@@ -729,6 +761,7 @@ CREATE TABLE "Extraction_Data" (
     "columnLabel" TEXT NOT NULL,
     "columnValue" TEXT NOT NULL,
     "rowOrder" INTEGER NOT NULL,
+    "hash" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "createdBy" TEXT NOT NULL,
@@ -817,6 +850,9 @@ CREATE UNIQUE INDEX "File_slug_key" ON "File"("slug");
 CREATE UNIQUE INDEX "Project_File_slug_key" ON "Project_File"("slug");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Column_Transco_Value_slug_key" ON "Column_Transco_Value"("slug");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Column_slug_key" ON "Column"("slug");
 
 -- CreateIndex
@@ -827,6 +863,9 @@ CREATE UNIQUE INDEX "Project_Column_slug_key" ON "Project_Column"("slug");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Project_Column_projectId_softwareLabel_fileLabel_order_key" ON "Project_Column"("projectId", "softwareLabel", "fileLabel", "order");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Project_Column_Transco_Value_slug_key" ON "Project_Column_Transco_Value"("slug");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Row_slug_key" ON "Row"("slug");
@@ -931,6 +970,9 @@ ALTER TABLE "Project_File" ADD CONSTRAINT "Project_File_iteratorLabel_fkey" FORE
 ALTER TABLE "Project_File" ADD CONSTRAINT "Project_File_fileLabel_softwareLabel_fkey" FOREIGN KEY ("fileLabel", "softwareLabel") REFERENCES "File"("label", "softwareLabel") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Column_Transco_Value" ADD CONSTRAINT "Column_Transco_Value_fileLabel_softwareLabel_columnLabel_fkey" FOREIGN KEY ("fileLabel", "softwareLabel", "columnLabel") REFERENCES "Column"("fileLabel", "softwareLabel", "label") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Column" ADD CONSTRAINT "Column_fileLabel_softwareLabel_fkey" FOREIGN KEY ("fileLabel", "softwareLabel") REFERENCES "File"("label", "softwareLabel") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -950,6 +992,9 @@ ALTER TABLE "Project_Column" ADD CONSTRAINT "Project_Column_standardFieldLabel_f
 
 -- AddForeignKey
 ALTER TABLE "Project_Column" ADD CONSTRAINT "Project_Column_fileLabel_softwareLabel_columnLabel_fkey" FOREIGN KEY ("fileLabel", "softwareLabel", "columnLabel") REFERENCES "Column"("fileLabel", "softwareLabel", "label") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Project_Column_Transco_Value" ADD CONSTRAINT "Project_Column_Transco_Value_projectId_softwareLabel_fileL_fkey" FOREIGN KEY ("projectId", "softwareLabel", "fileLabel", "columnLabel") REFERENCES "Project_Column"("projectId", "softwareLabel", "fileLabel", "columnLabel") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Row" ADD CONSTRAINT "Row_fileLabel_softwareLabel_columnLabel_fkey" FOREIGN KEY ("fileLabel", "softwareLabel", "columnLabel") REFERENCES "Column"("fileLabel", "softwareLabel", "label") ON DELETE CASCADE ON UPDATE CASCADE;

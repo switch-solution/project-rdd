@@ -1,7 +1,9 @@
 import { prisma } from "@/lib/prisma"
-import type { FormatDate, ExtractionData, Column, PersonEmail } from "@/src/class/transform/iTransform";
-import { Society, Person, WorkContract, Child } from "@/src/class/transform/iTransform";
+import type { FormatDate, ExtractionData, Column, PersonEmail, Transcoding } from "@/src/class/transform/iTransform";
+import { Society, Person, WorkContract, Child, Establishment } from "@/src/class/transform/iTransform";
 import type { IteratorLabel } from "@/src/helpers/typeTransco";
+import * as crypto from "crypto";
+
 export class Transform {
 
     projectId: string;
@@ -38,38 +40,14 @@ export class Transform {
         })
         return rowOrder?.rowOrder ? rowOrder.rowOrder : 0
     }
-    lastDsn = async (value: string): Promise<{
-        dsnId: string;
-        dsnMonth: string;
-    }> => {
-        try {
-            const dsn = await prisma.dsn_Value_Exist.findFirstOrThrow({
-                where: {
-                    value,
-                    projectId: this.projectId
-                },
-                select: {
-                    dsnId: true,
-                    dsnMonth: true
-                },
-                orderBy: {
-                    dsnMonth: 'desc'
-                }
-            })
-            return dsn
-        } catch (err: unknown) {
-            console.error(err)
-            throw new Error(err as string)
-        }
 
-    }
     process = async ({
         columns,
         datas,
         standardField
     }: {
         columns: Column[],
-        datas: Society | Person | WorkContract | PersonEmail | Child,
+        datas: Society | Person | WorkContract | PersonEmail | Child | Establishment,
         standardField: {
             label: string,
             field: string
@@ -92,10 +70,19 @@ export class Transform {
                     }
 
                 }
+
                 //Check format 
                 if (column.type === 'date' && column.format) {
                     value = await this.convertFormatDate(value, column.format as FormatDate)
                 }
+
+                //Transcoding
+
+                let findTranscoding = await this.getTranscoding(column.label, value)
+                if (findTranscoding) {
+                    value = findTranscoding.targetValue
+                }
+
                 datasList.push({
                     projectId: this.projectId,
                     extractionLabel: this.extractionLabel,
@@ -105,8 +92,26 @@ export class Transform {
                     rowOrder: lastRow ? lastRow + 1 : 1,
                     createdBy: this.userId,
                 })
+
             }
-            await this.saveData(datasList)
+            //Concat all values
+            let concatValue = ''
+            for (const value of datasList) {
+                concatValue += `${this.extractionLabel}_${this.fileLabel}_${value.columnValue}_${value.columnValue}`
+            }
+            //Generate hash
+            const hash = crypto.createHash('sha256');
+            hash.update(concatValue);
+            const hashRow = hash.digest('hex');
+            const hashExist = await prisma.extraction_Data.findFirst({
+                where: {
+                    projectId: this.projectId,
+                    hash: hashRow
+                }
+            })
+            if (!hashExist) {
+                await this.saveData(datasList, hashRow)
+            }
 
         } catch (err: unknown) {
             console.error(err)
@@ -114,10 +119,15 @@ export class Transform {
         }
     }
 
-    saveData = async (datasList: ExtractionData[]) => {
+    saveData = async (datasList: ExtractionData[], hash: string) => {
         try {
             await prisma.extraction_Data.createMany({
-                data: datasList
+                data: datasList.map((row) => {
+                    return {
+                        ...row,
+                        hash
+                    }
+                })
             })
         } catch (err) {
             console.error(err)
@@ -153,7 +163,28 @@ export class Transform {
             console.error(err)
             throw new Error(err as string)
         }
+    }
 
+    getTranscoding = async (columnLabel: string, sourceValue: string): Promise<Transcoding | null> => {
+        try {
+            const transcoding = await prisma.project_Column_Transco_Value.findFirst({
+                where: {
+                    projectId: this.projectId,
+                    fileLabel: this.fileLabel,
+                    columnLabel: columnLabel,
+                    sourceValue: sourceValue
+                },
+                select: {
+                    targetValue: true
+                }
+
+            })
+
+            return transcoding
+        } catch (err: unknown) {
+            console.error(err)
+            throw new Error(err as string)
+        }
     }
     loadStandardField = async (iteratorLabel: IteratorLabel) => {
         try {

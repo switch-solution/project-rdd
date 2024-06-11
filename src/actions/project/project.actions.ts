@@ -6,7 +6,6 @@ import z from 'zod';
 import { action, ActionError } from '@/lib/safe-actions';
 import { prisma } from '@/lib/prisma';
 import { Logger } from '@/src/class/logger';
-import { format } from 'path';
 export const createProject = action(ProjectCreateSchema, async (values: z.infer<typeof ProjectCreateSchema>, { userId }) => {
 
     const { label, description, softwareLabel } = ProjectCreateSchema.parse(values);
@@ -48,7 +47,17 @@ export const createProject = action(ProjectCreateSchema, async (values: z.infer<
                 Column: {
                     include: {
                         Row: true
-                    }
+                    },
+                }
+            }
+        })
+        const transcos = await prisma.column.findMany({
+            where: {
+                softwareLabel: softwareLabel
+            },
+            include: {
+                Column_Transco_Value: {
+
                 }
             }
         })
@@ -93,21 +102,6 @@ export const createProject = action(ProjectCreateSchema, async (values: z.infer<
             }).flat(1)
 
         })
-        const rows = file.map((file) => {
-            return file.Column.map((column) => {
-                return column.Row.map((row) => {
-                    return {
-                        projectId: project.id,
-                        createdBy: userId,
-                        softwareLabel: softwareLabel,
-                        fileLabel: file.label,
-                        columnLabel: column.label,
-                        order: row.order,
-                        value: row.value
-                    }
-                })
-            })
-        })
         await prisma.project_Row.createMany({
             data: file.map((file) => {
                 return file.Column.map((column) => {
@@ -125,6 +119,24 @@ export const createProject = action(ProjectCreateSchema, async (values: z.infer<
                 })
             }).flat(2)
         })
+        await prisma.project_Column_Transco_Value.createMany({
+            data: transcos.map((transcos) => {
+                return transcos.Column_Transco_Value.map((transco) => {
+                    return {
+                        projectId: project.id,
+                        createdBy: userId,
+                        order: transco.order,
+                        softwareLabel: softwareLabel,
+                        columnLabel: transco.columnLabel,
+                        fileLabel: transco.fileLabel,
+                        sourceValue: transco.sourceValue,
+                        targetValue: transco.targetValue,
+                    }
+                })
+
+            }).flat(1)
+        })
+
 
     } catch (err: unknown) {
         throw new ActionError(err as string);

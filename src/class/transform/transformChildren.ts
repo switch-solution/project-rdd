@@ -11,7 +11,8 @@ export class TransformChildren extends Transform implements ITransform {
     contractId?: string;
     siren?: string;
     iteratorLabel: IteratorLabel;
-    constructor(props: { projectId: string; extractionLabel: string; userId: string; fileLabel: string; numSS?: string; contractId?: string; siren?: string; iteratorLabel: IteratorLabel }) {
+    dsnId: string;
+    constructor(props: { projectId: string; extractionLabel: string; userId: string; fileLabel: string; numSS?: string; contractId?: string; siren?: string; iteratorLabel: IteratorLabel, dsnId: string }) {
         super(props)
         this.projectId = props.projectId
         this.extractionLabel = props.extractionLabel
@@ -21,13 +22,13 @@ export class TransformChildren extends Transform implements ITransform {
         this.contractId = props.contractId
         this.siren = props.siren
         this.iteratorLabel = props.iteratorLabel
+        this.dsnId = props.dsnId
 
     }
     data = async ({ numSS, contractId, siren }: { numSS?: string, contractId?: string, siren?: string }) => {
         if (!numSS) {
             throw new Error("Le siren est obligatoire")
         }
-        const lastDsn = await this.lastDsn(numSS)
         const children = await prisma.person_Children.findMany({
             where: {
                 numSS,
@@ -86,10 +87,10 @@ export class TransformChildren extends Transform implements ITransform {
 
     standardField = async (iterator: IteratorLabel) => {
         try {
-            if (iterator !== "Email") {
-                throw new Error("L'itérateur doit être 'email'")
+            if (iterator !== "Enfant") {
+                throw new Error("L'itérateur doit être enfant'")
             }
-            const standardFieldSociety = await this.loadStandardField('Email')
+            const standardFieldSociety = await this.loadStandardField(iterator)
             return standardFieldSociety
         } catch (err: unknown) {
             console.error(err)

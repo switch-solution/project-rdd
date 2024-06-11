@@ -14,6 +14,7 @@ import { iteratorV0003 } from './seed/12_iterator.v0003.seed';
 import { filev0006 } from './seed/13_file.v0006.seed';
 import { iteratorV0004 } from './seed/14_iterator.v0004.seed';
 import { filev0007 } from './seed/15_file.v0007.seed';
+import { filev0008 } from './seed/16_file.v0008.seed';
 const prisma = new PrismaClient(
     {
         log: [
@@ -165,6 +166,15 @@ const main = async () => {
             process.exit(1)
         })
     await filev0007.run()
+        .then(async () => {
+            await prisma.$disconnect()
+        })
+        .catch(async (e) => {
+            console.error(e)
+            await prisma.$disconnect()
+            process.exit(1)
+        })
+    await filev0008.run()
         .then(async () => {
             await prisma.$disconnect()
         })

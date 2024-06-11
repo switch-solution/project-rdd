@@ -62,6 +62,17 @@ export const columns: ColumnDef<ProjectColumn>[] = [
         }
     },
     {
+        header: "Transcodification",
+        id: 'transcoding',
+        cell: ({ row }) => {
+            return (
+                <Link href={`/project/${row.original.projectSlug}/param/${row.original.fileSlug}/column/${row.original.slug}/transcoding`}>
+                    <Pencil />
+                </Link>
+            )
+        }
+    },
+    {
         header: "Supprimer",
         id: 'delete',
         cell: ({ row }) => {

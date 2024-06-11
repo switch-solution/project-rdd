@@ -227,64 +227,98 @@ model Project_File {
     @@id([projectId, fileLabel, softwareLabel])
 }
 
+model Column_Transco_Value {
+    sourceValue   String
+    targetValue   String
+    fileLabel     String
+    softwareLabel String
+    columnLabel   String
+    order         Int
+    Column        Column   @relation(fields: [fileLabel, softwareLabel, columnLabel], references: [fileLabel, softwareLabel, label], onDelete: Cascade)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    createdBy     String   @default("system")
+    slug          String   @unique
+
+    @@id([softwareLabel, fileLabel, columnLabel, sourceValue])
+}
+
 model Column {
-    fileLabel          String
-    softwareLabel      String
-    File               File             @relation(fields: [fileLabel, softwareLabel], references: [label, softwareLabel], onDelete: Cascade)
-    label              String
-    slug               String           @unique
-    description        String?
-    createdAt          DateTime         @default(now())
-    updatedAt          DateTime         @updatedAt
-    createdBy          String           @default("system")
-    type               String
-    Format             Format?          @relation(fields: [type, format], references: [type, format])
-    standardFieldLabel String?
-    Standard_Field     Standard_Field?  @relation(fields: [standardFieldLabel], references: [label])
-    order              Int
-    typeValue          String           @default("defaultValue")
-    min                Int?
-    max                Int?
-    minLength          Int?
-    maxLength          Int?
-    format             String?
-    isRequired         Boolean          @default(false)
-    defaultValue       String?
-    Row                Row[]
-    Project_Column     Project_Column[]
+    fileLabel            String
+    softwareLabel        String
+    File                 File                   @relation(fields: [fileLabel, softwareLabel], references: [label, softwareLabel], onDelete: Cascade)
+    label                String
+    slug                 String                 @unique
+    description          String?
+    createdAt            DateTime               @default(now())
+    updatedAt            DateTime               @updatedAt
+    createdBy            String                 @default("system")
+    type                 String
+    Format               Format?                @relation(fields: [type, format], references: [type, format])
+    standardFieldLabel   String?
+    Standard_Field       Standard_Field?        @relation(fields: [standardFieldLabel], references: [label])
+    order                Int
+    typeValue            String                 @default("defaultValue")
+    min                  Int?
+    max                  Int?
+    minLength            Int?
+    maxLength            Int?
+    format               String?
+    isRequired           Boolean                @default(false)
+    defaultValue         String?
+    Row                  Row[]
+    Project_Column       Project_Column[]
+    Column_Transco_Value Column_Transco_Value[]
 
     @@id([fileLabel, softwareLabel, label])
     @@unique([fileLabel, softwareLabel, order])
 }
 
 model Project_Column {
-    projectId          String
-    Project            Project         @relation(fields: [projectId], references: [id], onDelete: Cascade)
-    fileLabel          String
-    label              String
-    softwareLabel      String
-    columnLabel        String
-    typeValue          String          @default("defaultValue")
-    type               String
-    Format             Format?         @relation(fields: [type, format], references: [type, format])
-    format             String?
-    standardFieldLabel String?
-    Standard_Field     Standard_Field? @relation(fields: [standardFieldLabel], references: [label])
-    min                Int?
-    max                Int?
-    minLength          Int?
-    maxLength          Int?
-    defaultValue       String?
-    isRequired         Boolean         @default(false)
-    order              Int             @default(1)
-    Column             Column          @relation(fields: [fileLabel, softwareLabel, columnLabel], references: [fileLabel, softwareLabel, label], onDelete: Cascade)
-    createdAt          DateTime        @default(now())
-    updatedAt          DateTime        @updatedAt
-    createdBy          String
-    slug               String          @unique @default(cuid())
+    projectId                    String
+    Project                      Project                        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    fileLabel                    String
+    label                        String
+    softwareLabel                String
+    columnLabel                  String
+    typeValue                    String                         @default("defaultValue")
+    type                         String
+    Format                       Format?                        @relation(fields: [type, format], references: [type, format])
+    format                       String?
+    standardFieldLabel           String?
+    Standard_Field               Standard_Field?                @relation(fields: [standardFieldLabel], references: [label])
+    min                          Int?
+    max                          Int?
+    minLength                    Int?
+    maxLength                    Int?
+    defaultValue                 String?
+    isRequired                   Boolean                        @default(false)
+    order                        Int                            @default(1)
+    Column                       Column                         @relation(fields: [fileLabel, softwareLabel, columnLabel], references: [fileLabel, softwareLabel, label], onDelete: Cascade)
+    createdAt                    DateTime                       @default(now())
+    updatedAt                    DateTime                       @updatedAt
+    createdBy                    String
+    slug                         String                         @unique @default(cuid())
+    Project_Column_Transco_Value Project_Column_Transco_Value[]
 
     @@id([projectId, softwareLabel, fileLabel, columnLabel])
     @@unique([projectId, softwareLabel, fileLabel, order])
+}
+
+model Project_Column_Transco_Value {
+    projectId      String
+    sourceValue    String
+    targetValue    String
+    softwareLabel  String
+    columnLabel    String
+    fileLabel      String
+    createdAt      DateTime       @default(now())
+    updatedAt      DateTime       @updatedAt
+    createdBy      String
+    slug           String         @unique @default(cuid())
+    Project_Column Project_Column @relation(fields: [projectId, softwareLabel, fileLabel, columnLabel], references: [projectId, softwareLabel, fileLabel, columnLabel])
+
+    @@id([projectId, fileLabel, columnLabel, sourceValue])
 }
 
 model Row {
@@ -820,6 +854,7 @@ model Extraction_Data {
     columnLabel     String
     columnValue     String
     rowOrder        Int
+    hash            String
     createdAt       DateTime        @default(now())
     updatedAt       DateTime        @updatedAt
     createdBy       String

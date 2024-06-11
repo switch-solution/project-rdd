@@ -11,7 +11,8 @@ export class TransformWorkContract extends Transform implements ITransform {
     contractId?: string;
     siren?: string;
     iteratorLabel: IteratorLabel;
-    constructor(props: { projectId: string; extractionLabel: string; userId: string; fileLabel: string; numSS?: string; contractId?: string; siren?: string; iteratorLabel: IteratorLabel }) {
+    dsnId: string;
+    constructor(props: { projectId: string; extractionLabel: string; userId: string; fileLabel: string; numSS?: string; contractId?: string; siren?: string; iteratorLabel: IteratorLabel, dsnId: string }) {
         super(props)
         this.projectId = props.projectId
         this.extractionLabel = props.extractionLabel
@@ -21,18 +22,18 @@ export class TransformWorkContract extends Transform implements ITransform {
         this.contractId = props.contractId
         this.siren = props.siren
         this.iteratorLabel = props.iteratorLabel
+        this.dsnId = props.dsnId
 
     }
     data = async ({ numSS, contractId, siren }: { numSS?: string, contractId?: string, siren?: string }) => {
         if (!numSS || !contractId) {
             throw new Error("Le numéro SS et le contrat Id sont obligatoires")
         }
-        const lastDsn = await this.lastDsn(numSS)
         const workContract = await prisma.workContract.findFirstOrThrow({
             where: {
                 numSS,
                 contractId,
-                dsnId: lastDsn.dsnId
+                dsnId: this.dsnId,
             },
             select: {
                 dsnId: true,
@@ -108,7 +109,7 @@ export class TransformWorkContract extends Transform implements ITransform {
             if (iterator !== "Contrat de travail") {
                 throw new Error("L'itérateur doit être 'individu'")
             }
-            const standardFieldWorkContract = await this.loadStandardField('Contrat de travail')
+            const standardFieldWorkContract = await this.loadStandardField(iterator)
             return standardFieldWorkContract
         } catch (err: unknown) {
             console.error(err)

@@ -5,6 +5,7 @@ import { Project } from "@/src/class/project";
 import { notFound } from "next/navigation";
 import { Container, ContainerBreadCrumb, ContainerDataTable } from "@/components/container/Container";
 import { Extraction } from "@/src/class/extraction";
+import type { IteratorLabel } from "@/src/helpers/typeTransco";
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -13,7 +14,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import type { IdListPerson, IdListSociety, IdListWorkContract } from "@/src/helpers/type";
+import type { IdListEstablishment, IdListPerson, IdListSociety, IdListWorkContract } from "@/src/helpers/type";
 import Link from "next/link";
 export default async function Page({ params }: { params: { projectSlug: string, extractionSlug: string } }) {
     const session = await auth()
@@ -35,12 +36,12 @@ export default async function Page({ params }: { params: { projectSlug: string, 
     if (!extractionDetail) {
         notFound()
     }
-    const { transcoSociety, transcoPerson, transcoWorkContract, transcoPersonEmail, transcoPersonEnfant } = await project.getTransco()
+    const { transcoSociety, transcoPerson, transcoWorkContract, transcoPersonEmail, transcoPersonEnfant, transcoEstablishment } = await project.getTransco()
     const filesList = await extraction.getFiles()
 
     const files = filesList.files.map((file) => {
         let idList: unknown
-        switch (file.iteratorLabel) {
+        switch (file.iteratorLabel as IteratorLabel) {
             case 'Société':
                 idList = transcoSociety
                 break
@@ -56,6 +57,10 @@ export default async function Page({ params }: { params: { projectSlug: string, 
             case 'Enfant':
                 idList = transcoPersonEnfant
                 break
+            case 'Etablissement':
+                idList = transcoEstablishment
+                break
+
         }
         return {
             projectSlug: params.projectSlug,
@@ -68,7 +73,7 @@ export default async function Page({ params }: { params: { projectSlug: string, 
             projectFileSlug: file.projectFileSlug,
             extractionFileSlug: file.slug,
             countRows: filesList.countFiles.countRows.find((count) => count.fileLabel === file.fileLabel)?.count || 0,
-            idList: idList as IdListPerson[] | IdListSociety[] | IdListWorkContract[]
+            idList: idList as IdListPerson[] | IdListSociety[] | IdListWorkContract[] | IdListEstablishment[]
         }
     })
 

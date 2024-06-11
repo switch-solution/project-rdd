@@ -7,6 +7,22 @@ export type Society = {
     zipCode: string,
     city: string,
 }
+
+export type Transcoding = {
+    targetValue: string
+
+}
+
+export type Establishment = {
+    dsnId: string,
+    siren: string,
+    nic: string,
+    ape: string,
+    postalCode: string,
+    city: string,
+    legalStatus: string,
+    transcoEstablishmentNewId: string | null,
+}
 export type Child = {
     numSS: string,
     lastname: string,
@@ -108,16 +124,11 @@ export interface ITransform {
     numSS?: string;
     contractId?: string;
     siren?: string;
+    nic?: string;
+    dsnId: string;
     iteratorLabel: IteratorLabel;
-    data({ numSS, contractId, siren }: { numSS?: string, contractId?: string, siren?: string }): Promise<Society | Person | WorkContract | PersonEmail | Children>;
+    data({ numSS, contractId, siren, nic }: { numSS?: string, contractId?: string, siren?: string, nic?: string }): Promise<Society | Person | WorkContract | PersonEmail | Children | Establishment>;
     transform(): Promise<void>;
-    lastDsn(value: string): Promise<
-        {
-            dsnId: string;
-            dsnMonth: string;
-        }
-
-    >;
     standardField(iterator: IteratorLabel): Promise<
         {
             label: string;
@@ -128,7 +139,8 @@ export interface ITransform {
     columns(): Promise<Column[]>;
     lastRow(): Promise<number>;
     convertFormatDate(value: string, format: FormatDate): Promise<string>;
-    saveData(datasList: ExtractionData[]): Promise<void>;
-    process({ columns, datas, standardField }: { columns: Column[], datas: Society | Person | WorkContract | Child, standardField: { label: string, field: string }[] }): Promise<void>;
+    getTranscoding(columnLabel: string, sourceValue: string): Promise<Transcoding | null>;
+    saveData(datasList: ExtractionData[], hash: string): Promise<void>;
+    process({ columns, datas, standardField }: { columns: Column[], datas: Society | Person | WorkContract | Child | Establishment, standardField: { label: string, field: string }[] }): Promise<void>;
 
 }

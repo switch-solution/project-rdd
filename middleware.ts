@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { env } from "@/lib/env"
 const node_env = env.NODE_ENV
 const API_ROOT = env.API_ROOT
@@ -9,6 +9,7 @@ export async function middleware(request: NextRequest) {
     if (request.geo?.country !== "FR" && node_env === "production") {
         return new Response(`Blocked for legal reasons this service is not available in ${request.geo?.country}`, { status: 451 })
     }
+    // Check if the request is an API request
     if (request.url.startsWith(`${DOMAIN}/api/v1/`)) {
         const authorization = request.headers.get('Authorization')
         if (!authorization) {
@@ -20,5 +21,7 @@ export async function middleware(request: NextRequest) {
         }
 
     }
+    return NextResponse.rewrite(request.nextUrl)
+
 
 }
