@@ -25,7 +25,7 @@ export class Column {
 
     getTranscoding = async () => {
         try {
-            const transcoding = await prisma.column_Transco.findMany({
+            const transcoding = await prisma.column_Transco_Value.findMany({
                 where: {
                     Column: {
                         slug: this.slug
